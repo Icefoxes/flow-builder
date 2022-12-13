@@ -47,7 +47,7 @@ const getIcon = (type: NodeType) => {
         case NodeType.Olympus:
             return <FaWarehouse className="logo" />
         case NodeType.PxNET:
-            return <img src={solace} className="logo" alt="logo" />
+            return <img src={solace} className="logo" alt="logo" style={{ width: 40 }} />
         case NodeType.DataHighway:
             return <SiApachekafka className="logo" />
         default:

@@ -21,7 +21,16 @@ export const flowApi = createApi({
                 }
             }
         }),
+        createFlow: builder.mutation<Flow, { flow: Flow }>({
+            query: ({ flow }) => {
+                return {
+                    url: `/flows`,
+                    method: 'POST',
+                    body: flow
+                }
+            }
+        }),
     }),
 })
 
-export const { useLazyGetFlowsByTeamQuery, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;
+export const { useLazyGetFlowsByTeamQuery, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;

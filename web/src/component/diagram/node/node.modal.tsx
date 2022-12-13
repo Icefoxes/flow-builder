@@ -103,7 +103,7 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
                 else if (info.type === AdditionalInfoType.Selection) {
                     return <>
                         <Form.Item key={info.name} label={info.name} name={info.name.toLowerCase()} rules={[{ required: info.required, message: `Please input your ${info.name}` }]}>
-                            <Select defaultValue={info.default as string}>
+                            <Select>
                                 {(info.selections as string[]).map(node => <Select.Option key={`${info.name}-${node}`} value={node}>{node}</Select.Option>)}
                             </Select>
                         </Form.Item>

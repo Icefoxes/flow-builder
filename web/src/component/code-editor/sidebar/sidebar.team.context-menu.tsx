@@ -9,7 +9,8 @@ export const TEAM_SIDEBAR_MENU = "TEAM_SIDEBAR_MENU";
 
 
 export enum TeamContextMenuType {
-    Add = "Add"
+    AddTeam = "AddTeam",
+    AddFlow = "AddFlow"
 }
 
 interface TeamContextMenuProps {
@@ -20,8 +21,17 @@ export const TeamContextMenu: FC<TeamContextMenuProps> = ({ onItemClick }) => {
 
     return <>
         <Menu theme={'dark'} id={TEAM_SIDEBAR_MENU}>
-            <Item onClick={() => onItemClick(TeamContextMenuType.Add)}>
+            <Item key={'create'} onClick={() => onItemClick(TeamContextMenuType.AddTeam)}>
                 Add New Team
+            </Item>
+
+            <Item key={'create'}
+                hidden={({ props }) => {
+                    const { source } = props;
+                    return 'workspace' === source;
+                }}
+                onClick={({ props }) => onItemClick(TeamContextMenuType.AddFlow, props)}>
+                Add New Flow
             </Item>
         </Menu>
     </>

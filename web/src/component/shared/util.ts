@@ -42,17 +42,28 @@ const findEdgeId = (event: EventTarget) => {
             element = element.parentElement;
         }
         const parent = element.parentElement;
-        if(parent) {
+        if (parent) {
             return parent.getAttribute('data-testid')?.substring('rf__edge-'.length);
         }
     }
     return null;
 }
 
+const newFlow = (id: string) => {
+    return {
+        id: newUUID(),
+        team: id,
+        name: 'TO_BE_REPLACED',
+        nodes: [],
+        edges: []
+    } as Flow;
+}
+
 const utils = {
     transformFlowLight,
     newUUID,
-    findEdgeId
+    findEdgeId,
+    newFlow
 }
 
 export default utils;

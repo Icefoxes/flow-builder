@@ -12,10 +12,11 @@ import { FlowContextMenu, FlowContextMenuType, FLOW_SIDEBAR_MENU } from "./sideb
 import { TeamContextMenu, TeamContextMenuType, TEAM_SIDEBAR_MENU } from "./sidebar.team.context-menu";
 import { TeamCreateModal } from "./team.create.modal";
 
-import { useCreateTeamMutation, useLazyGetFlowsByTeamQuery } from "../../../service";
+import { useCreateFlowMutation, useCreateTeamMutation, useLazyGetFlowsByTeamQuery } from "../../../service";
 import { setActiveFlow } from "../../../feature/admin/adminSlice";
 
 import { Flow, Team } from "../../../model";
+import utils from "../../shared/util";
 
 
 // --team
@@ -50,6 +51,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams }) => {
     // data
     const [getFlowsByTeam] = useLazyGetFlowsByTeamQuery();
     const [createTeam] = useCreateTeamMutation();
+    const [createFlow] = useCreateFlowMutation();
 
     // menu
     const { show: showFlowContextMenu } = useContextMenu({
@@ -122,9 +124,13 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams }) => {
     }
 
     const onTeamContextMenu = (item: TeamContextMenuType, props?: any) => {
-        if (item === TeamContextMenuType.Add) {
+        if (item === TeamContextMenuType.AddTeam) {
             setTeamCreateVisible(true);
             return;
+        }
+        else if (item === TeamContextMenuType.AddFlow) {
+            const { id } = props;
+            createFlow({ flow: utils.newFlow(id) });
         }
     }
 
@@ -134,7 +140,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams }) => {
                 title: () => <div className="gnomon-tree-node" onContextMenu={e => {
                     showTeamContextMenu({
                         event: e,
-                        props: team.id
+                        props: { id: team.id, source: 'tree' }
                     })
                 }}>
                     <FcFolder className="prefix" />   {team.name}

@@ -36,12 +36,16 @@ export const adminSlice = createSlice({
     builder.addMatcher(flowApi.endpoints.updateFlow.matchFulfilled, (state, { payload }) => {
       state.activeFlow = payload
     });
+    builder.addMatcher(flowApi.endpoints.createFlow.matchFulfilled, (state, { payload }) => {
+      state.activeFlow = payload;
+    });
     builder.addMatcher(teamApi.endpoints.getTeams.matchFulfilled, (state, { payload }) => {
       state.teams = payload
     });
     builder.addMatcher(teamApi.endpoints.createTeam.matchFulfilled, (state, { payload }) => {
       state.teams = [...state.teams, payload]
     });
+
   },
 })
 
