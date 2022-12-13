@@ -1,0 +1,34 @@
+.node-root {
+    display: flex;
+    height: 3em;
+
+    .text-container {
+        width: 200px;
+        height: 3em;
+        border: 1px solid black;
+        border-radius: 1em;
+        display: flex;
+        align-items: center;
+        padding: 5px;
+    }
+
+    .icon-container {
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .logo {
+            height: 100%;
+            height: 20px;
+            width: 20px;
+            margin: 0 3px;
+        }
+
+        .logo-copy {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}

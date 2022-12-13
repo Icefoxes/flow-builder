@@ -1,0 +1,28 @@
+@import "../../styles/size";
+
+.editor-container {
+    height: 90vh;
+    width: 100%;
+    overflow: hidden;
+    
+    .terminal {
+        position: fixed;
+        min-height: 10vh;
+        bottom: 0;
+        max-height: 60vh;
+        overflow: hidden;
+
+        .close-icon {
+            position: absolute;
+            right: 2em;
+            top: 1em;
+            z-index: 100;
+            font-size: 1em;
+            color: white; 
+        }
+
+        .close-icon :hover{
+            cursor: pointer;
+        }
+    }
+}

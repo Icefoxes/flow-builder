@@ -1,0 +1,10 @@
+@import "../../styles/size";
+
+.diagram-container {
+    height: $diagramHeight;
+    width: 100%;
+
+    .react-flow__attribution {
+        display: none;
+    }
+}
