@@ -1,10 +1,11 @@
 import { memo } from "react";
-import { notification } from "antd";
+import { notification, Tooltip } from "antd";
 import {
     CopyOutlined
 } from '@ant-design/icons';
 import { Handle, Position } from 'reactflow';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Textfit } from 'react-textfit';
 import { SiApachekafka, SiApacheflink, SiRedhat, SiElasticsearch, SiMicrosoftsqlserver, SiProcessingfoundation, SiRedis, SiIbm, SiCloudways, SiGoogleplay } from 'react-icons/si';
 import { FaWarehouse } from 'react-icons/fa';
 import hbase from '../../../asset/hbase.svg';
@@ -228,24 +229,36 @@ export const getAdditionalInfo = (type: NodeType) => {
 }
 
 export const NodeConfig = {
-    Width: 200,
+    Width: 300,
     NodeSpace: 50,
     Height: 40
 }
 
+const trim = (str: string) => {
+    return str.length > 60 ? `${str.substring(0, 30)}...${str.substring(str.length - 30, str.length)}` : str;
+}
+
 export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { label, description, nodeType }, id }) => {
-    return <div className="node-root">
+    return <div className="node-root" data-id={id}>
         <Handle
-            position={'right' as Position}
-            type="target"
+            position={Position.Top}
+            type={'source'}
+            id={Position.Top}
             style={{ background: '#555' }}
         />
-        <div className="text-container" data-id={id} style={{ borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px' }}>
-            <div style={{ width: '80%' }} data-id={id}>
-                <span data-id={id}>{label}</span>
-                {description && <span data-id={id} style={{ 'display': 'block' }}>{description || ''}</span>}
+        <div className="text-container" style={{ borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px' }}>
+            <div style={{ width: 'fit-content' }} >
+                <Textfit className="text-label" mode="single" max={10} forceSingleModeWidth={true}>
+                    <Tooltip title={label} style={{ width: 'fit-content' }}>
+                        {trim(label)}
+                    </Tooltip>
+                </Textfit>
+
+                <Textfit className="text-description" mode="single" max={7} forceSingleModeWidth={true} >
+                    {`${nodeType} ${description ? ' | ' + description : ''}`}
+                </Textfit>
             </div>
-            <div className="icon-container" data-id={id}>
+            <div className="icon-container" >
                 {getIcon(nodeType)}
                 <CopyToClipboard text={label}
                     onCopy={() => {
@@ -260,8 +273,9 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
             </div>
         </div>
         {getType(nodeType) !== NodeTypePerBusiness.External && <Handle
-            type="source"
-            position={'left' as Position}
+            position={Position.Bottom}
+            id={Position.Bottom}
+            type="target"
             style={{ background: '#555' }}
         />}
 

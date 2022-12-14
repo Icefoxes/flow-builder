@@ -6,12 +6,12 @@
     height: $toolbarHeight;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
 
     .tab {
         height: 100%;
-        width: 100px;
+        width: fit-content;
+        padding: 0 15px;
         background-color: $editor-color;
         display: flex;
         align-items: center;

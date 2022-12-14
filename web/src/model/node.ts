@@ -63,3 +63,11 @@ export interface GnomonEdge {
     label?: string;
     type: string;
 }
+
+export interface FlowLight {
+    id: string;
+    name: string;
+    tag?: string;
+    team: string;
+}
+

@@ -7,23 +7,38 @@ import { Team } from "../../../model";
 interface TeamCreateModalProps {
     isModalOpen: boolean;
     handleOk: (team: Team) => void
+    toggleVisible: VoidFunction
+    activeTeam?: Team
 }
 
-export const TeamCreateModal: FC<TeamCreateModalProps> = ({ isModalOpen, handleOk }) => {
+export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalOpen, handleOk, toggleVisible }) => {
     const [form] = Form.useForm();
     return <>
         <Modal title="Team Info"
             open={isModalOpen}
-            onOk={e => {
+            onCancel={toggleVisible}
+            onOk={() => {
                 form.validateFields().then(values => {
-                    const team = Object.assign({}, values, {
-                        id: utils.newUUID()
-                    });
-                    handleOk(team);
+                    if (!activeTeam) {
+                        handleOk(Object.assign({}, values, {
+                            id: utils.newUUID()
+                        }));
+                    } else {
+                        handleOk(Object.assign({}, activeTeam, {
+                            ...values
+                        }));
+                    }
                 })
             }}>
-
             <Form
+                onLoadedData={e => {
+                    if (activeTeam) {
+                        form.resetFields();
+                        form.setFieldsValue(activeTeam);
+                    } else {
+                        form.resetFields();
+                    }
+                }}
                 form={form}
                 name="team-info"
                 labelCol={{ span: 8 }}

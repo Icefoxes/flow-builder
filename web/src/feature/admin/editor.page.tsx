@@ -4,25 +4,28 @@ import { Resizable } from "re-resizable";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CodeEditComponent, CodeEditProps, EditorSidebarComponent, TeamCreateModal, TEAM_SIDEBAR_MENU } from "../../component/code-editor"
-import { selectActiveFlow, selectTeams, setActiveFlow } from "./adminSlice";
-import { useCreateTeamMutation, useGetTeamsQuery, useUpdateFlowMutation } from "../../service";
+import { selectActiveFlow, selectFlows, selectTeams, setActiveFlow } from "./adminSlice";
+import { useCreateTeamMutation, useGetFlowsQuery, useGetTeamsQuery, useUpdateFlowMutation } from "../../service";
 import './editor.page.scss';
 import { useContextMenu } from "react-contexify";
+import { Team } from "../../model";
 
 const { Sider } = Layout;
 
 export const EditorPage: FC = () => {
     const disptach = useDispatch();
     useGetTeamsQuery({});
+    useGetFlowsQuery();
     const activeFlow = useSelector(selectActiveFlow);
     const teams = useSelector(selectTeams);
 
-    const [teamCreateVisible, setTeamCreateVisible] = useState<boolean>(false);
+    const [teamCreateModalVisible, setTeamCreateModalVisible] = useState<boolean>(false);
     const [createTeam] = useCreateTeamMutation();
     const { show: showTeamContextMenu } = useContextMenu({
         id: TEAM_SIDEBAR_MENU
     });
 
+    const flows = useSelector(selectFlows);
     const [updateFlow, { isLoading }] = useUpdateFlowMutation();
     const [sidebarWidth, setSidebarWidth] = useState<number>(0);
     const props: CodeEditProps = {
@@ -36,6 +39,10 @@ export const EditorPage: FC = () => {
         setActiveFlow: (flow) => disptach(setActiveFlow(flow))
     }
 
+    const onTeamCreateModal = (team: Team) => {
+        createTeam(team);
+        setTeamCreateModalVisible(false);
+    }
     return <Layout className="edit-page-root">
         <Resizable
             defaultSize={{
@@ -61,7 +68,7 @@ export const EditorPage: FC = () => {
                     })
                 }
             }}>
-                {teams && <EditorSidebarComponent teams={teams} />}
+                {(teams && flows) && <EditorSidebarComponent teams={teams} flows={flows} />}
 
             </Sider>
         </Resizable>
@@ -71,10 +78,7 @@ export const EditorPage: FC = () => {
             <CodeEditComponent {...props} />
         </Layout>
 
-        <TeamCreateModal isModalOpen={teamCreateVisible} handleOk={team => {
-            createTeam(team);
-            setTeamCreateVisible(false);
-        }} />
+        <TeamCreateModal isModalOpen={teamCreateModalVisible} handleOk={onTeamCreateModal} toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
         <div className="status-bar">
         </div>
     </Layout>

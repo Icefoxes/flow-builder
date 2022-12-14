@@ -1,15 +1,24 @@
 .node-root {
     display: flex;
     height: 3em;
+    width: fit-content;
+
 
     .text-container {
-        width: 200px;
+        width: fit-content;
         height: 3em;
         border: 1px solid black;
         border-radius: 1em;
         display: flex;
         align-items: center;
         padding: 5px;
+    }
+
+    .text-label {
+    }
+
+    .text-description {
+        display: block;
     }
 
     .icon-container {

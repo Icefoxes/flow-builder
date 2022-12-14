@@ -2,7 +2,7 @@ import { FC } from "react"
 import { Spin, Tooltip } from "antd";
 import {
     SaveOutlined,
-    EditOutlined
+    ApartmentOutlined
 } from '@ant-design/icons';
 import './editor.toolbar.scss';
 import { Flow } from "../../../model";
@@ -29,8 +29,8 @@ export const EditorToolBarComponent: FC<EditorToolBarProps> = ({ onClick, isLoad
                 <SaveOutlined className="toolbar-icon" onClick={() => onClick(EditorToolbarControlType.Save)} />
             </Tooltip>
 
-            <Tooltip title="Edit">
-                <EditOutlined className="toolbar-icon" onClick={() => onClick(EditorToolbarControlType.Edit)} />
+            <Tooltip title="Go to Diagram">
+                <ApartmentOutlined className="toolbar-icon" onClick={() => onClick(EditorToolbarControlType.Edit)} />
             </Tooltip>
         </div>
 

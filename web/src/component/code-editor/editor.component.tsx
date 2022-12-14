@@ -87,7 +87,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
 
     const onNodeType = (nodeType: string) => {
         const value = editor?.getModel()?.getValue();;
-      
+
         if (nodeType === 'kafka' && value) {
             let flow = JSON.parse(value) as Flow;
             if (flow) {
@@ -114,15 +114,25 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             const value = editor?.getModel()?.getValue();
             if (value) {
                 const flow = JSON.parse(value) as Flow;
-                onSaveFlow(flow);
-                messageApi.success('Saved Flow');
+                if (flow.name) {
+                    onSaveFlow(flow);
+                    messageApi.success('Saved Flow');
+                }
+                else {
+                    messageApi.error('please select one Flow first');
+                }
             }
         } else if (nodeType === EditorToolbarControlType.Edit) {
             const value = editor?.getModel()?.getValue();
             if (value) {
                 const flow = JSON.parse(value) as Flow;
-                setActiveFlow(flow);
-                navigation('/diagram')
+                if (flow.name) {
+                    setActiveFlow(flow);
+                    navigation('/diagram')
+                }
+                else {
+                    messageApi.error('please select one Flow first');
+                }
             }
         }
     }
