@@ -2,7 +2,6 @@ import { FC, useState } from "react"
 import { useContextMenu } from "react-contexify";
 import { message, Modal, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import { useNavigate } from "react-router-dom";
 import { FcFolder, FcBriefcase, FcBarChart } from 'react-icons/fc';
 import {
     ExclamationCircleOutlined,
@@ -30,8 +29,6 @@ interface EditorSidebarProps {
 
 
 export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows }) => {
-    // hooks
-    const navigation = useNavigate();
     // data
 
     const [createTeam] = useCreateTeamMutation();
@@ -63,10 +60,8 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
             const flow = props as FlowLight;
             getFlowById({ id: flow.id }); // ==> setActiveFlow ==> Show on Editor
             return;
-        } else if (item === FlowContextMenuType.Open) {
-            const flow = props as FlowLight;
-            navigation(`teams/${flow.team}/flows/${flow.id}`);
-        } else if (item === FlowContextMenuType.Delete) {
+        }
+        else if (item === FlowContextMenuType.Delete) {
             const flow = props as FlowLight;
             Modal.confirm({
                 title: 'Confirm',
@@ -79,7 +74,18 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                     message.success(`deleted ${flow.name}`);
                 }
             });
-          
+        } else if (item === FlowContextMenuType.Copy) {
+            const flow = props as FlowLight;
+            getFlowById({ id: flow.id }).unwrap().then(data => {
+                createFlow({
+                    flow: Object.assign({}, data, {
+                        _id: undefined,
+                        id: utils.newUUID(),
+                        name: 'TO_BE_REPLACED',
+                        tag: undefined
+                    })
+                });
+            })
         }
     }
 

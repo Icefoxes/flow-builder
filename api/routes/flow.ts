@@ -55,8 +55,10 @@ flowRoute.delete('/', (req: Request, res: Response) => {
                 return res.json(flow);
             }
         })
+    } else {
+        return res.status(500);
     }
-    return res.status(500);
+  
 });
 
 export { flowRoute };

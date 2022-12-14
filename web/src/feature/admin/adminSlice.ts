@@ -51,6 +51,7 @@ export const adminSlice = createSlice({
     });
 
     builder.addMatcher(flowApi.endpoints.deleteFlow.matchFulfilled, (state, { payload }) => {
+      state.activeFlow = null;
       state.flows = [...state.flows.filter(flow => flow.id !== payload.id)];
     });
 

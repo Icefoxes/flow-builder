@@ -2,7 +2,7 @@ import { FC } from "react"
 import { Tooltip } from "antd";
 import {
     SaveOutlined,
-    EditOutlined,
+    CodeSandboxOutlined,
     UndoOutlined,
 } from '@ant-design/icons';
 import './diagram.toolbar.scss';
@@ -29,8 +29,8 @@ export const DiagramToolBarComponent: FC<{ onClick: (type: ControlType) => void,
             <SaveOutlined className="toolbar-icon" onClick={() => onClick(ControlType.Save)} />
         </Tooltip>
 
-        <Tooltip title="Edit">
-            <EditOutlined className="toolbar-icon" onClick={() => onClick(ControlType.Edit)} />
+        <Tooltip title="Go to Editor">
+            <CodeSandboxOutlined className="toolbar-icon" onClick={() => onClick(ControlType.Edit)} />
         </Tooltip>
     </div>
 }
