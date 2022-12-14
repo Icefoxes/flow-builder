@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { notification } from "antd";
+import { notification, Tooltip } from "antd";
 import {
     CopyOutlined
 } from '@ant-design/icons';
@@ -234,26 +234,28 @@ export const NodeConfig = {
     Height: 40
 }
 
+const trim = (str: string) => {
+    return str.length > 60 ? `${str.substring(0, 30)}...${str.substring(str.length - 30, str.length)}` : str;
+}
+
 export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { label, description, nodeType }, id }) => {
     return <div className="node-root" data-id={id}>
         <Handle
-            position={'right' as Position}
-            type="target"
-            style={{ background: '#555' }}
-        />
-        <Handle
-            position={'bottom' as Position}
-            type="target"
+            position={Position.Top}
+            type={'source'}
+            id={Position.Top}
             style={{ background: '#555' }}
         />
         <div className="text-container" style={{ borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px' }}>
             <div style={{ width: 'fit-content' }} >
-                <Textfit className="text-label" mode="single" max={18} >
-                    {label}
+                <Textfit className="text-label" mode="single" max={10} forceSingleModeWidth={true}>
+                    <Tooltip title={label} style={{ width: 'fit-content' }}>
+                        {trim(label)}
+                    </Tooltip>
                 </Textfit>
 
-                <Textfit className="text-description" mode="single" max={12} >
-                    {`${nodeType} ${description ? '|' + description : ''}`}
+                <Textfit className="text-description" mode="single" max={7} forceSingleModeWidth={true} >
+                    {`${nodeType} ${description ? ' | ' + description : ''}`}
                 </Textfit>
             </div>
             <div className="icon-container" >
@@ -271,14 +273,11 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
             </div>
         </div>
         {getType(nodeType) !== NodeTypePerBusiness.External && <Handle
-            type="source"
-            position={'left' as Position}
+            position={Position.Bottom}
+            id={Position.Bottom}
+            type="target"
             style={{ background: '#555' }}
         />}
-        {getType(nodeType) !== NodeTypePerBusiness.External && <Handle
-            position={'top' as Position}
-            type="source"
-            style={{ background: '#555' }}
-        />}
+
     </div>
 })

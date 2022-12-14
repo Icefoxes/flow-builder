@@ -16,5 +16,9 @@
     .toolbar-icon :hover {
         cursor: pointer;
     }
-}
 
+    .disabled-icon {
+        margin: 0 10px;
+        color: gray;
+    }
+}

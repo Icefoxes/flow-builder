@@ -47,7 +47,7 @@ export const UserDefinedEdge = memo<EdgeProps>(({
         >
             <div>
                 <button className="edgebutton" onClick={(event) => onEdgeClick(event, id)}>
-                    ×
+                    x
                 </button>
             </div>
         </foreignObject>

@@ -68,8 +68,18 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
             navigation(`teams/${flow.team}/flows/${flow.id}`);
         } else if (item === FlowContextMenuType.Delete) {
             const flow = props as FlowLight;
-            deleteFlow({ flow })
-            message.success(`deleted ${flow.name}`)
+            Modal.confirm({
+                title: 'Confirm',
+                icon: <ExclamationCircleOutlined />,
+                content: 'Do you want to delete this flow',
+                okText: 'Confirm',
+                cancelText: 'Cancel',
+                onOk: () => {
+                    deleteFlow({ flow });
+                    message.success(`deleted ${flow.name}`);
+                }
+            });
+          
         }
     }
 
@@ -91,7 +101,10 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                 content: 'Do you want to delete this team',
                 okText: 'Confirm',
                 cancelText: 'Cancel',
-                onOk: () => deleteTeam(team)
+                onOk: () => {
+                    deleteTeam(team);
+                    message.success(`deleted ${team.name}`);
+                }
             });
         }
         else if (item === TeamContextMenuType.EditTeam) {

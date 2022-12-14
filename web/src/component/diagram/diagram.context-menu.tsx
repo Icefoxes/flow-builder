@@ -5,7 +5,7 @@ import {
 } from "react-contexify";
 
 
-export const DIAGRAM_MENU_ID = "EDGE_MENU";
+export const DIAGRAM_MENU_ID = "DIAGRAM_MENU_ID";
 
 export enum DiagramContextMenuType {
     AddNode = "AddNode",

@@ -8,14 +8,15 @@ import { NodeConfig } from "./node";
 
 const elk = new ELK()
 
+type Direction = 'LR' | 'UD';
 
-const transformGraph = (nodes: Node<any>[], edges: Edge[]) => {
+const transformGraph = (nodes: Node<any>[], edges: Edge[], direction: Direction = 'LR') => {
     return {
         id: "root",
         layoutOptions: {
             'elk.algorithm': 'layered',
-            'elk.direction': 'LEFT',
-            'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers': '50'
+            'elk.direction': 'UP',
+            'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers': `${NodeConfig.NodeSpace}`
         },
         children: [
             ...nodes.map(node => {
@@ -36,8 +37,8 @@ const transformGraph = (nodes: Node<any>[], edges: Edge[]) => {
     }
 }
 
-export const ELKLayout = (nodes: Node<any>[], edges: Edge[]) => {
-    const graph = transformGraph(nodes, edges);
+export const ELKLayout = (nodes: Node<any>[], edges: Edge[], direction: Direction = 'LR') => {
+    const graph = transformGraph(nodes, edges, direction);
     return elk.layout(graph)
         .then(calc => {
             const positionedNodes = calc.children;
@@ -48,7 +49,7 @@ export const ELKLayout = (nodes: Node<any>[], edges: Edge[]) => {
                         position: {
                             x: found.x,
                             y: found.y
-                        }
+                        },
                     } as Node<any>)
                 });
             } else {
