@@ -1,9 +1,11 @@
 .node-root {
     display: flex;
     height: 3em;
-
+    width: fit-content;
+    max-width: 300px;
     .text-container {
-        width: 200px;
+        width: fit-content;
+        max-width: 250px;
         height: 3em;
         border: 1px solid black;
         border-radius: 1em;
@@ -13,11 +15,9 @@
     }
 
     .text-label {
-        font-family: 'Courier New', Courier, monospace;
     }
 
     .text-description {
-        font-family: 'Courier New', Courier, monospace;
         display: block;
     }
 

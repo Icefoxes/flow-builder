@@ -90,8 +90,6 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
         <Form
             autoComplete="off"
             form={form}>
-
-
             {getBasicInfo().concat(getAdditionalInfo(node.data.nodeType)).map(info => {
                 if (info.type === AdditionalInfoType.Input) {
                     return <>

@@ -49,6 +49,21 @@ const findEdgeId = (event: EventTarget) => {
     return null;
 }
 
+const findNodeId = (event: EventTarget) => {
+    let element = event as HTMLElement;
+    if (element) {
+        while (element !== null && element.parentElement !== null && !element.parentElement.getAttribute('data-id')) {
+            element = element.parentElement;
+        }
+        const parent = element.parentElement;
+        if (parent) {
+            return parent.getAttribute('data-id');
+        }
+    }
+    return null;
+}
+
+
 const newFlow = (id: string) => {
     return {
         id: newUUID(),
@@ -63,6 +78,7 @@ const utils = {
     transformFlowLight,
     newUUID,
     findEdgeId,
+    findNodeId,
     newFlow
 }
 

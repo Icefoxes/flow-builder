@@ -32,6 +32,7 @@ import { setActiveFlow } from '../../feature/admin/adminSlice';
 import { NodeModalComponent } from "./node/node.modal";
 import { ELKLayout } from "./elk";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
+import utils from "../shared/util";
 
 
 
@@ -142,7 +143,7 @@ export const DiagramComponent: FC<{
     }
 
     const onNodeClick: NodeMouseHandler = (e) => {
-        const id = (e.target as HTMLElement).getAttribute("data-id");
+        const id = utils.findNodeId(e.target);
         const find = nodes.find(node => node.id === id);
         if (find) {
         }
@@ -150,7 +151,7 @@ export const DiagramComponent: FC<{
 
 
     const onNodeContextMenu: NodeMouseHandler = (e) => {
-        const id = (e.target as HTMLElement).getAttribute("data-id");
+        const id = utils.findNodeId(e.target);
         const find = nodes.find(node => node.id === id);
         if (find) {
             showNodeContextMenu({
