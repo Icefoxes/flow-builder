@@ -24,8 +24,8 @@ export const flowApi = {
     addFlow: (flow: Flow) => {
         return flows.insertOne(flow);
     },
-    findFlowById: (teamId: string, id: string) => {
-        return flows.findOne({ 'team': teamId, id });
+    findFlowById: (id: string) => {
+        return flows.findOne({ id });
     },
     findFlowByName: (teamId: string, name: string) => {
         return flows.findOne({ 'team': teamId, name });
@@ -34,10 +34,22 @@ export const flowApi = {
         return flows.find({ 'team': teamId }).toArray();
     },
     updateFlow: (flow: Flow) => {
-        return flows.updateOne({ 'id': flow.id }, flow);
+        delete (flow as any)['_id'];
+        return flows.updateOne({ 'id': flow.id }, { $set: { ...flow } });
+    },
+    deleteFlow: (flow: Flow) => {
+        return flows.deleteOne({ id: flow.id });
     },
     findAll: () => {
-        return flows.find().toArray();
+        return flows.find({}, {
+            projection: {
+                _id: 0,
+                id: 1,
+                name: 1,
+                tag: 1,
+                team: 1,
+            }
+        }).toArray();
     }
 }
 
@@ -49,7 +61,11 @@ export const teamApi = {
         return teams.findOne({ id });
     },
     updateTeam: (team: Team) => {
-        return teams.updateOne({ id: team.id }, team);
+        delete (team as any)['_id'];
+        return teams.updateOne({ id: team.id }, { $set: { ...team } });
+    },
+    deleteTeam: (team: Team) => {
+        return teams.deleteOne({ id: team.id });
     },
     findAll: () => {
         return teams.find().toArray();

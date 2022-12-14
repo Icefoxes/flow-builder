@@ -11,7 +11,8 @@ export const FLOW_SIDEBAR_MENU = "FLOW_SIDEBAR_MENU";
 
 export enum FlowContextMenuType {
     Edit = "Edit",
-    Open = 'Open'
+    Open = 'Open',
+    Delete = 'Delete'
 }
 
 interface FlowContextMenuProps {
@@ -34,6 +35,13 @@ export const FlowContextMenu: FC<FlowContextMenuProps> = ({ onItemClick }) => {
                 onItemClick(FlowContextMenuType.Open, flow)
             }}>
                 Open Flow
+            </Item>
+
+            <Item onClick={({ props }) => {
+                const flow = props as Flow;
+                onItemClick(FlowContextMenuType.Delete, flow)
+            }}>
+                Delete Flow
             </Item>
         </Menu>
     </>

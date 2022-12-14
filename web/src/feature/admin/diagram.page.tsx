@@ -28,18 +28,18 @@ const ActiveDiagramContent: FC<{ flow: Flow, isLoading?: boolean }> = ({ flow, i
     </>
 }
 
-const DiagramContent: FC<{ teamId: string, diagramId: string }> = ({ teamId, diagramId }) => {
-    const { data, isLoading } = useGetFlowByIdQuery({ teamId, diagramId });
+const DiagramContent: FC<{ diagramId: string }> = ({ diagramId }) => {
+    const { data, isLoading } = useGetFlowByIdQuery({ id: diagramId });
     return <ActiveDiagramContent flow={data as Flow} isLoading={isLoading} />
 }
 
 
 export const DiagramEditPage: FC = () => {
-    const { teamId, diagramId } = useParams();
+    const { diagramId } = useParams();
     return <>
-        {(teamId && diagramId) && <DiagramContent teamId={teamId} diagramId={diagramId} />}
+        {(diagramId) && <DiagramContent diagramId={diagramId} />}
 
-        {!((teamId && diagramId)) && <Result
+        {!((diagramId)) && <Result
             status="404"
             title="404"
             subTitle="Sorry, the page you visited does not exist."

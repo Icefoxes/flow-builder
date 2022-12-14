@@ -1,10 +1,11 @@
-import { FC } from 'react';
+import { memo } from 'react';
 import { getBezierPath, EdgeProps } from 'reactflow';
 import "./edge.scss";
 
 const foreignObjectSize = 40;
 
-export const UserDefinedEdge: FC<EdgeProps> = ({
+
+export const UserDefinedEdge = memo<EdgeProps>(({
     id,
     label,
     sourceX,
@@ -14,7 +15,7 @@ export const UserDefinedEdge: FC<EdgeProps> = ({
     sourcePosition,
     targetPosition,
     style = {},
-    markerEnd,
+    markerEnd
 }) => {
     const [edgePath, labelX, labelY] = getBezierPath({
         sourceX,
@@ -28,29 +29,27 @@ export const UserDefinedEdge: FC<EdgeProps> = ({
         evt.stopPropagation();
         alert(`remove ${id}`);
     };
-    return (
-        <>
-            <path
-                id={id}
-                style={style}
-                className="react-flow__edge-path"
-                d={edgePath}
-                markerEnd={markerEnd}
-            />
-            <foreignObject
-                width={foreignObjectSize}
-                height={foreignObjectSize}
-                x={labelX - foreignObjectSize / 2}
-                y={labelY - foreignObjectSize / 2}
-                className="edgebutton-foreignobject"
-                requiredExtensions="http://www.w3.org/1999/xhtml"
-            >
-                <div>
-                    <button className="edgebutton" onClick={(event) => onEdgeClick(event, id)}>
-                        ×
-                    </button>
-                </div>
-            </foreignObject>
-        </>
-    );
-}
+    return <>
+        <path
+            id={id}
+            style={style}
+            className="react-flow__edge-path"
+            d={edgePath}
+            markerEnd={markerEnd}
+        />
+        <foreignObject
+            width={foreignObjectSize}
+            height={foreignObjectSize}
+            x={labelX - foreignObjectSize / 2}
+            y={labelY - foreignObjectSize / 2}
+            className="edgebutton-foreignobject"
+            requiredExtensions="http://www.w3.org/1999/xhtml"
+        >
+            <div>
+                <button className="edgebutton" onClick={(event) => onEdgeClick(event, id)}>
+                    ×
+                </button>
+            </div>
+        </foreignObject>
+    </>
+});

@@ -240,10 +240,15 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
             type="target"
             style={{ background: '#555' }}
         />
+        <Handle
+            position={'bottom' as Position}
+            type="target"
+            style={{ background: '#555' }}
+        />
         <div className="text-container" data-id={id} style={{ borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px' }}>
             <div style={{ width: '80%' }} data-id={id}>
-                <span data-id={id}>{label}</span>
-                {description && <span data-id={id} style={{ 'display': 'block' }}>{description || ''}</span>}
+                <span className="text-label" data-id={id} style={{ fontSize: `${(label.length / 160) * 100}%`, }}>{label}</span>
+                <span className="text-description" data-id={id} style={{ fontSize: '40%' }}>{`${nodeType} ${description ? '|' + description : ''}`}</span>
             </div>
             <div className="icon-container" data-id={id}>
                 {getIcon(nodeType)}
@@ -264,6 +269,10 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
             position={'left' as Position}
             style={{ background: '#555' }}
         />}
-
+        {getType(nodeType) !== NodeTypePerBusiness.External && <Handle
+            position={'top' as Position}
+            type="source"
+            style={{ background: '#555' }}
+        />}
     </div>
 })

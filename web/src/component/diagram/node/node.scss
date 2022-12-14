@@ -12,6 +12,15 @@
         padding: 5px;
     }
 
+    .text-label {
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .text-description {
+        font-family: 'Courier New', Courier, monospace;
+        display: block;
+    }
+
     .icon-container {
         z-index: 10;
         display: flex;

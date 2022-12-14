@@ -13,6 +13,10 @@
     }
 }
 
+.ant-tree-treenode :hover {
+    background-color: #37373d;
+}
+
 .ant-tree-list {
     color: $sidebar-text-color;
 }
