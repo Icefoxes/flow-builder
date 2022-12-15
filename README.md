@@ -13,4 +13,4 @@ docker-compose up
 1. read /edit flow mode
 
 ## Bug
-1. create team  
+1. sidebar toggle, editor not adapt

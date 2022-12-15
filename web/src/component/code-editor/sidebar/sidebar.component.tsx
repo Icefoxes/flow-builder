@@ -117,8 +117,8 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         else if (item === TeamContextMenuType.DeleteTeam) {
             const team = props as Team;
             const flowsNotDeleted = flows.find(f => f.team === team.id);
-            if(flowsNotDeleted) {
-                message.error(`please delete all flows under ${team.name}`);
+            if (flowsNotDeleted) {
+                message.error(`please delete all flows under ${team.name} first`);
                 return;
             }
             Modal.confirm({
@@ -170,13 +170,17 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                 isLeaf: false,
                 children: [...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
                     return {
-                        title: () => <div className="gnomon-tree-node" onContextMenu={e => {
-                            showFlowContextMenu({
-                                event: e,
-                                props: flow
-                            });
-                            e.stopPropagation();
-                        }}>
+                        title: () => <div className="gnomon-tree-node"
+                            onDoubleClick={() => [
+                                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                            ]}
+                            onContextMenu={e => {
+                                showFlowContextMenu({
+                                    event: e,
+                                    props: flow
+                                });
+                                e.stopPropagation();
+                            }}>
                             <FcBarChart className="prefix" /> {flow.name}
                         </div>,
                         key: `${flow.id}`,
@@ -191,13 +195,17 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                         isLeaf: false,
                         children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
                             return {
-                                title: () => <div className="gnomon-tree-node" onContextMenu={e => {
-                                    showFlowContextMenu({
-                                        event: e,
-                                        props: flow
-                                    });
-                                    e.stopPropagation();
-                                }}>
+                                title: () => <div className="gnomon-tree-node"
+                                    onDoubleClick={() => [
+                                        getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                    ]}
+                                    onContextMenu={e => {
+                                        showFlowContextMenu({
+                                            event: e,
+                                            props: flow
+                                        });
+                                        e.stopPropagation();
+                                    }}>
                                     <FcBarChart className="prefix" /> {flow.name}
                                 </div>,
                                 key: `${flow.id}`,
