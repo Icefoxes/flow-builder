@@ -28,11 +28,20 @@ export const TeamContextMenu: FC<TeamContextMenuProps> = ({ onItemClick }) => {
                 Add Team
             </Item>
 
-            <Item key={'edit'} onClick={({ props }) => onItemClick(TeamContextMenuType.EditTeam, props)}>
+            <Item key={'edit'}
+                hidden={({ props }) => {
+                    const { source } = props;
+                    return 'workspace' === source;
+                }}
+                onClick={({ props }) => onItemClick(TeamContextMenuType.EditTeam, props)}>
                 Edit Team
             </Item>
 
-            <Item key={'delete'} onClick={({ props }) => onItemClick(TeamContextMenuType.DeleteTeam, props)}>
+            <Item key={'delete'}
+                hidden={({ props }) => {
+                    const { source } = props;
+                    return 'workspace' === source;
+                }} onClick={({ props }) => onItemClick(TeamContextMenuType.DeleteTeam, props)}>
                 Delete Team
             </Item>
 

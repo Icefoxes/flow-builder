@@ -130,7 +130,7 @@ export const DiagramComponent: FC<{
             setRedoSnapshot([]);
             setUndoSnapshot([]);
             dispatch(setActiveFlow(updatedFlow));
-            navigate('/editor');
+            navigate('/');
         } else if (control === ControlType.Undo) {
             const snap = undoSnapshot.pop();
             if (snap) {
@@ -235,6 +235,7 @@ export const DiagramComponent: FC<{
                 props: find
             });
         }
+        e.stopPropagation();
     }
 
     const onEdgeContextMenu: EdgeMouseHandler = (e) => {
@@ -250,6 +251,7 @@ export const DiagramComponent: FC<{
             event: e,
             props: found
         })
+        e.stopPropagation();
     }
 
     useEffect(() => {
@@ -278,9 +280,8 @@ export const DiagramComponent: FC<{
             snapToGrid={true}
             onNodeClick={onNodeClick}
             onContextMenu={(event) => {
-                if (nodes.length === 0) {
-                    showDiagramContextMenu({ event })
-                }
+                showDiagramContextMenu({ event });
+                event.stopPropagation();
             }}
             onNodeContextMenu={onNodeContextMenu}
             onEdgeContextMenu={onEdgeContextMenu}

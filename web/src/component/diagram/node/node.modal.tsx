@@ -43,6 +43,7 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
     }, [node, form]);
 
     return <Modal
+        forceRender
         title={
             <div
                 style={{

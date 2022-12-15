@@ -61,12 +61,11 @@ const EditorPage: FC = () => {
                 right: true
             }}>
             <Sider width={'100%'} className="edit-page-sidebar" onContextMenu={e => {
-                if (teams && teams.length === 0) {
-                    showTeamContextMenu({
-                        event: e,
-                        props: { source: 'workspace' }
-                    })
-                }
+                showTeamContextMenu({
+                    event: e,
+                    props: { source: 'workspace' }
+                });
+                e.stopPropagation();
             }}>
                 {(teams && flows) && <EditorSidebarComponent teams={teams} flows={flows} />}
 
@@ -78,7 +77,7 @@ const EditorPage: FC = () => {
             <CodeEditComponent {...props} />
         </Layout>
 
-        <TeamCreateModal isModalOpen={teamCreateModalVisible} handleOk={onTeamCreateModal} toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
+        <TeamCreateModal activeTeam={null} isModalOpen={teamCreateModalVisible} handleOk={onTeamCreateModal} toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
         <div className="status-bar">
         </div>
     </Layout>
