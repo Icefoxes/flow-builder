@@ -46,12 +46,12 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
         // onGnomonEditorAmount(editorParams);
 
         editorParams.addAction({
-            id: 'Run',
-            label: 'Run',
-            keybindings: [monacoTypes.KeyCode.F5],
+            id: 'Save',
+            label: 'Save',
+            keybindings: [monacoTypes.KeyMod.CtrlCmd | monacoTypes.KeyCode.KeyS],
             precondition: undefined,
             keybindingContext: undefined,
-            contextMenuGroupId: 'Create',
+            contextMenuGroupId: 'Gnomon',
             run(ed: monacoTypes.editor.ICodeEditor): void {
             }
         });
@@ -62,7 +62,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             keybindings: [monacoTypes.KeyMod.CtrlCmd | monacoTypes.KeyMod.Shift | monacoTypes.KeyCode.Backquote],
             precondition: undefined,
             keybindingContext: undefined,
-            contextMenuGroupId: 'Create',
+            contextMenuGroupId: 'Gnomon',
             run(): void {
                 setTerminalVisible(true);
             }
