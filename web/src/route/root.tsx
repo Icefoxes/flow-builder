@@ -31,10 +31,17 @@ const router = createBrowserRouter([
                         <EditorPage />
                     </Suspense>
                 </>
-
             },
             {
                 path: 'teams/:teamId/flows/:diagramId',
+                element: (
+                    <Suspense fallback={<LoadPage />}>
+                        <DiagramEditPage />
+                    </Suspense>
+                )
+            },
+            {
+                path: 'flows/:diagramId',
                 element: (
                     <Suspense fallback={<LoadPage />}>
                         <DiagramEditPage />

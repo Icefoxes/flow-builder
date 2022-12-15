@@ -11,7 +11,7 @@ export const ActiveDiagramContent: FC<{ flow: Flow, isLoading?: boolean }> = ({ 
     return <>
         <ReactFlowProvider>
             {(!isLoading && flow) && <>
-                <DiagramComponent flow={flow} onSave={(flow) => updateFlow({ flow })} />
+                <DiagramComponent key={flow.id} flow={flow} onSave={(f) => updateFlow({ flow: f })} />
             </>}
         </ReactFlowProvider>
     </>

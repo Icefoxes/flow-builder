@@ -1,8 +1,12 @@
 #gnomon-header {
     padding: 0 0 10px 0;
-    background-color: #3C3C3C;
+    background-color: #3c3c3c;
     display: flex;
     align-items: center;
+
+    .auto-complete {
+        margin: 0 8em;
+    }
 
     .trigger {
         margin: 0 0 0 1em;
