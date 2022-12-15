@@ -1,21 +1,22 @@
+import React from "react";
 import { FC } from "react";
 import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
-import { BasicLayout } from "../component";
-import { DiagramEditPage, EditorPage, ActiveDiagramEditPage } from "../feature";
 
+import { BasicLayout } from "../component";
+
+
+const EditorPage = React.lazy(() => import('../feature/admin/editor.page'));
+const CodePage = React.lazy(() => import('../feature/admin/code.page'));
+const DiagramEditPage = React.lazy(() => import('../feature/admin/diagram.edit.page'));
+const ActiveDiagramEditPage = React.lazy(() => import('../feature/admin/active.diagram.page'));
 const router = createBrowserRouter([
     {
         path: "/",
         element: <BasicLayout />,
         children: [
-            {
-                path: 'editor',
-                index: true,
-                element: <EditorPage />,
-            },
             {
                 index: true,
                 element: <EditorPage />
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
             {
                 path: 'diagram',
                 element: <ActiveDiagramEditPage />
+            },
+            {
+                path: 'code',
+                element: <CodePage />
             }
         ]
     },

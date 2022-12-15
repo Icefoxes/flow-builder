@@ -32,9 +32,3 @@ https://commitlint.js.org/#/
 
 ### Utils
 https://momentjs.com/
-
-
-### Pending issue
-1. left drag, white background
-2. close terminal, editor not to bottom
-3. layout 功能失效
