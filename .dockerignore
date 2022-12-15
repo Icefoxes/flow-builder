@@ -1,0 +1,23 @@
+
+web/node_modules/
+# production
+web/build/
+# testing
+web/coverage
+# misc
+web/.DS_Store
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/*.md
+
+api/test
+api/*.md
+api/node_modules/
+api/dist/
+
