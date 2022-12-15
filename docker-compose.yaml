@@ -1,0 +1,21 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - 'C:/data/db:/data/db'
+    ports:
+      - 27017:27017
+    restart: "unless-stopped"
+  app:
+    image: guokuojlu/gnomon-app-flow:latest
+    ports:
+      - 8080:8080
+    restart: "unless-stopped"
+
+networks:
+  front-tier:
+  back-tier:
