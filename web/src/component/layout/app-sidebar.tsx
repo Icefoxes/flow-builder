@@ -30,7 +30,7 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                         children: [
                             {
                                 key: '1-1',
-                                icon: <Link to='editor'><EditOutlined /></Link>,
+                                icon: <Link to='/'><EditOutlined /></Link>,
                                 label: 'Flow Editor'
                             },
                             {
@@ -43,7 +43,7 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                     },
                     {
                         key: '3',
-                        icon: <Link to='team'><UploadOutlined /></Link>,
+                        icon: <Link to='diagram'><UploadOutlined /></Link>,
                         label: 'Flow Viwer',
                     },
                 ]}

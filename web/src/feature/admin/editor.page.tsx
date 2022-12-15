@@ -12,7 +12,7 @@ import { Team } from "../../model";
 
 const { Sider } = Layout;
 
-export const EditorPage: FC = () => {
+const EditorPage: FC = () => {
     const disptach = useDispatch();
     useGetTeamsQuery({});
     useGetFlowsQuery();
@@ -83,3 +83,5 @@ export const EditorPage: FC = () => {
         </div>
     </Layout>
 }
+
+export default EditorPage;
