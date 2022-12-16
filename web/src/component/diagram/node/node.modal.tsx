@@ -44,6 +44,7 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
 
     return <Modal
         forceRender
+        keyboard
         title={
             <div
                 style={{

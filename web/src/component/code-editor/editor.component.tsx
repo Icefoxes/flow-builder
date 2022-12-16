@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useReducer, useRef, useState } from "react"
 import { message } from "antd";
 import {
     CloseOutlined,
@@ -15,6 +15,7 @@ import { EditorToolBarComponent, EditorToolbarControlType } from './toolbar';
 import { onMonacoWillMount } from "./editor.before.mount";
 import { Flow, NodeType } from "../../model";
 import utils from "../shared/util";
+import { EditorActionKind, visibleReducer } from "./editor.reducer";
 
 
 export interface CodeEditProps {
@@ -26,7 +27,6 @@ export interface CodeEditProps {
     setActiveFlow: (flow: Flow) => void,
 }
 
-
 export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoading, activeFlow, sidebarWidth, setActiveFlow }) => {
     // hooks
     const navigation = useNavigate();
@@ -35,7 +35,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
 
     const [messageApi, contextHolder] = message.useMessage();
     // state
-    const [terminalVisible, setTerminalVisible] = useState<boolean>(true);
+    const [state, dispatch] = useReducer(visibleReducer, { visible: true });
     const [editorWidth, setEditorWidth] = useState<number>(sidebarWidth);
     const [editor, setEditor] = useState<monacoTypes.editor.IStandaloneCodeEditor | null>(null);
 
@@ -55,7 +55,17 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             keybindingContext: undefined,
             contextMenuGroupId: 'Gnomon',
             run(ed: monacoTypes.editor.ICodeEditor): void {
-                onToolbarClick(EditorToolbarControlType.Save);
+                const value = ed.getModel()?.getValue();
+                if (value) {
+                    const flow = JSON.parse(value) as Flow;
+                    if (flow.name) {
+                        onSaveFlow(flow);
+                        messageApi.success('Saved Flow');
+                    }
+                    else {
+                        messageApi.error('please select one Flow first');
+                    }
+                }
             }
         });
 
@@ -67,7 +77,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             keybindingContext: undefined,
             contextMenuGroupId: 'Gnomon',
             run(): void {
-                setTerminalVisible(true);
+                dispatch({ type: EditorActionKind.TOGGLE });
             }
         });
 
@@ -89,25 +99,27 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
     // }
 
     const onNodeType = (nodeType: string) => {
-        const value = editor?.getModel()?.getValue();;
+        const editText = editor?.getModel()?.getValue();;
 
-        if (nodeType === 'kafka' && value) {
-            let flow = JSON.parse(value) as Flow;
-            if (flow) {
-                flow.nodes.push({
-                    id: utils.newUUID(),
-                    position: {
-                        x: 0,
-                        y: 0
-                    },
-                    data: {
-                        label: 'Kafka',
-                        nodeType: NodeType.Kafka,
-                    },
-                    type: 'gnomon'
-                })
-                editor?.getModel()?.setValue(JSON.stringify(flow, undefined, 2));
-                return;
+        if (editText && nodeType) {
+            const found = Object.values(NodeType).find(f => f.toLowerCase() === nodeType.toLowerCase());
+            if (found) {
+                let flow = JSON.parse(editText) as Flow;
+                if (flow) {
+                    flow.nodes.push({
+                        id: utils.newUUID(),
+                        position: {
+                            x: 0,
+                            y: 0
+                        },
+                        data: {
+                            label: `New ${found}`,
+                            nodeType: found,
+                        },
+                        type: 'gnomon'
+                    })
+                    editor?.getModel()?.setValue(JSON.stringify(flow, undefined, 2));
+                }
             }
         }
     }
@@ -165,12 +177,12 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             value={code}
             options={options} />
 
-        <div className="terminal" style={{ width: editorWidth, display: terminalVisible ? 'block' : 'none' }} >
+        <div className="terminal" style={{ width: editorWidth, display: state.visible ? 'block' : 'none' }} >
             <TerminalContextProvider>
                 <TerminalComponent onNodeType={onNodeType} width={editorWidth} />
             </TerminalContextProvider>
 
-            <CloseOutlined className="close-icon" onClick={() => setTerminalVisible(false)} />
+            <CloseOutlined className="close-icon" onClick={() => dispatch({ type: EditorActionKind.TOGGLE })} />
         </div>
     </div>
 }

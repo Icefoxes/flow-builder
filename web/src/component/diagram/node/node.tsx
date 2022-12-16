@@ -272,12 +272,12 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
                 </CopyToClipboard>
             </div>
         </div>
-        {getType(nodeType) !== NodeTypePerBusiness.External && <Handle
+        <Handle
             position={Position.Bottom}
             id={Position.Bottom}
             type="target"
             style={{ background: '#555' }}
-        />}
+        />
 
     </div>
 })
