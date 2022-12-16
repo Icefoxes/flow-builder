@@ -33,8 +33,7 @@ interface EditorSidebarModalState {
 }
 
 export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows }) => {
-    // data
-
+    // serivce
     const [createTeam] = useCreateTeamMutation();
     const [updateTeam] = useUpdateTeamMutation();
     const [deleteTeam] = useDeleteTeamMutation();
@@ -108,7 +107,6 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                 activeTeam: null,
                 teamCreateModalVisible: true
             });
-            return;
         }
         else if (item === TeamContextMenuType.AddFlow) {
             const { id } = props;

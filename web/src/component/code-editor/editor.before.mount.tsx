@@ -1,7 +1,6 @@
 import * as monacoTypes from "monaco-editor/esm/vs/editor/editor.api";
 import { EditorWillMount } from "react-monaco-editor";
 import { NodeType } from "../../model";
-import utils from "../shared/util";
 
 
 const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
@@ -16,7 +15,6 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                     id: {
                         description: "A unique identifier of the flow",
                         type: "string",
-                        default: utils.newUUID()
                     },
                     name: {
                         description: "the name for a flow",
@@ -44,7 +42,6 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                                 id: {
                                     description: "the id of the node",
                                     type: "string",
-                                    default: utils.newUUID()
                                 },
                                 data: {
                                     description: "the id of the node",

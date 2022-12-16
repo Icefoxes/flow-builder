@@ -5,7 +5,7 @@ import {
     UserOutlined,
     InfoCircleOutlined,
 } from '@ant-design/icons';
-
+import { useDebounceCallback } from '@react-hook/debounce';
 import './app-header.scss';
 import { useLazySearchNodeQuery } from "../../service";
 import { SearchItem } from "../../model";
@@ -48,6 +48,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
         });
 
     const handleSearch = (q: string) => {
+        console.log(q);
         if (q && q.length > 4) {
             searchNode({ q }).unwrap()
                 .then(nodes => {
@@ -79,7 +80,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
                 options={options}
                 autoFocus
                 onSelect={onSelect}
-                onSearch={handleSearch}
+                onSearch={useDebounceCallback(handleSearch, 300)}
             >
                 <Input.Search size="large" placeholder="search node" enterButton />
             </AutoComplete>
