@@ -13,6 +13,21 @@ interface TeamCreateModalProps {
 
 export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalOpen, handleOk, toggleVisible }) => {
     const [form] = Form.useForm();
+
+    const onOk = () => {
+        form.validateFields().then(values => {
+            if (!activeTeam) {
+                handleOk(Object.assign({}, values, {
+                    id: utils.newUUID()
+                }));
+            } else {
+                handleOk(Object.assign({}, activeTeam, {
+                    ...values
+                }));
+            }
+        })
+    }
+
     useEffect(() => {
         if (!!!activeTeam) {
             form.resetFields();
@@ -25,21 +40,11 @@ export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalO
     return <>
         <Modal title="Team Info"
             forceRender
+            keyboard
             open={isModalOpen}
             onCancel={toggleVisible}
-            onOk={() => {
-                form.validateFields().then(values => {
-                    if (!activeTeam) {
-                        handleOk(Object.assign({}, values, {
-                            id: utils.newUUID()
-                        }));
-                    } else {
-                        handleOk(Object.assign({}, activeTeam, {
-                            ...values
-                        }));
-                    }
-                })
-            }}>
+            okButtonProps={{ htmlType: 'submit' }}
+            onOk={onOk}>
             <Form
                 form={form}
                 name="team-info"

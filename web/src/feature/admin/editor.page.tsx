@@ -67,7 +67,7 @@ const EditorPage: FC = () => {
                 });
                 e.stopPropagation();
             }}>
-                {(teams && flows) && <EditorSidebarComponent teams={teams} flows={flows} />}
+                {(teams && flows) && <EditorSidebarComponent teams={teams} flows={flows} activeFlow={activeFlow} />}
 
             </Sider>
         </Resizable>

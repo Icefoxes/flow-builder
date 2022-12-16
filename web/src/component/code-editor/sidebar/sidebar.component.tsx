@@ -25,6 +25,7 @@ import utils from "../../shared/util";
 interface EditorSidebarProps {
     teams: Team[];
     flows: FlowLight[];
+    activeFlow: Flow | null;
 }
 
 interface EditorSidebarModalState {
@@ -32,7 +33,7 @@ interface EditorSidebarModalState {
     teamCreateModalVisible: boolean
 }
 
-export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows }) => {
+export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, activeFlow }) => {
     // serivce
     const [createTeam] = useCreateTeamMutation();
     const [updateTeam] = useUpdateTeamMutation();
@@ -64,7 +65,9 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
     const onFlowContextMenu = (item: FlowContextMenuType, props?: any) => {
         if (item === FlowContextMenuType.Edit) {
             const flow = props as FlowLight;
-            getFlowById({ id: flow.id }); // ==> setActiveFlow ==> Show on Editor
+            if (!!!activeFlow || (activeFlow.id !== flow.id)) {
+                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+            }
             return;
         }
         else if (item === FlowContextMenuType.Delete) {
@@ -169,9 +172,11 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                 children: [...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
                     return {
                         title: () => <div className="gnomon-tree-node"
-                            onDoubleClick={() => [
+                            onDoubleClick={() => {
+                                if (!!!activeFlow || (activeFlow.id !== flow.id)) {
                                 getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
-                            ]}
+                                }
+                            }}
                             onContextMenu={e => {
                                 showFlowContextMenu({
                                     event: e,
@@ -189,14 +194,16 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                         title: () => <div className="gnomon-tree-node">
                             <FcBriefcase className="prefix" /> {tag}
                         </div>,
-                        key: `${tag}`,
+                        key: `${team.id}-${tag}`,
                         isLeaf: false,
                         children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
                             return {
                                 title: () => <div className="gnomon-tree-node"
-                                    onDoubleClick={() => [
+                                    onDoubleClick={() => {
+                                        if (!!!activeFlow || (activeFlow.id !== flow.id)) {
                                         getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
-                                    ]}
+                                        }
+                                    }}
                                     onContextMenu={e => {
                                         showFlowContextMenu({
                                             event: e,

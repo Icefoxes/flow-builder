@@ -257,16 +257,16 @@ export const DiagramComponent: FC<{
         e.stopPropagation();
     }
 
-    const onVerticalLayout = useCallback(() => {
+    const onVerticalLayout = () => {
         ELKLayout(nodes, edges, 'UD').then(v => {
             setNodes(v);
         });
         reactFlowInstance.fitView();
-    }, [nodes, edges, reactFlowInstance, setNodes])
+    }
 
     useEffect(() => {
         onVerticalLayout();
-    }, [onVerticalLayout])
+    }, [])
 
 
     return <div className="diagram-container" >

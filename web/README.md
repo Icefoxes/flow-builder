@@ -37,3 +37,28 @@ https://commitlint.js.org/#/
 
 ### Utils
 https://momentjs.com/
+
+# E2E Test
+* add team
+* add flow
+* add tag
+* add node by command line
+* editor short cut (save, toggle terminal)
+* save flow
+* go to diagram
+* add node
+* change node type
+* edit node info
+* add three nodes and name as account
+* connect them
+* delete one node
+* undo/redo
+* delete one edge
+* undo/redo
+* copy node
+* double click flow
+* copy flow
+* search node
+* delete team
+* delete flow
+* delete team
