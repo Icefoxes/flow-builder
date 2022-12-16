@@ -50,6 +50,15 @@ export const flowApi = {
                 team: 1,
             }
         }).toArray();
+    },
+    searchNode: (text: string) => {
+        return flows.aggregate([
+            { $match: { nodes: { $elemMatch: { 'data.label': { $regex: text } } } } },
+            { $unwind: "$nodes" },
+            { $match: { 'nodes.data.label': { $regex: text } } },
+            { $project: { flowId: '$id', flowName: '$name', nodeName: '$nodes.data.label', nodeType: '$nodes.data.nodeType', _id: 0 } },
+            { $limit: 5 }
+        ]).toArray();
     }
 }
 

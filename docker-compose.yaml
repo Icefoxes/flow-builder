@@ -2,6 +2,8 @@ services:
   mongo:
     image: mongo
     restart: always
+    volumes:
+      - db-data:/data/db
     ports:
       - 27017:27017
   app:
@@ -11,3 +13,7 @@ services:
       - 8080:8080
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://mongo:27017
+
+volumes:
+  db-data:
+    external: true

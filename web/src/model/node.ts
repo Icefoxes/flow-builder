@@ -71,3 +71,9 @@ export interface FlowLight {
     team: string;
 }
 
+export interface SearchItem {
+    flowId: string;
+    flowName: string;
+    nodeName: string;
+    nodeType: string;
+}

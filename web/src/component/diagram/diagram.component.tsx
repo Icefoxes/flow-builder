@@ -74,10 +74,11 @@ export const DiagramComponent: FC<{
     onSave: (flow: Flow) => void,
 }> = ({ flow, onSave }) => {
     const [messageApi, contextHolder] = message.useMessage();
+    // hooks
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const reactFlowInstance = useReactFlow();
+    // state
     const [undoSnapshot, setUndoSnapshot] = useState<EditState[]>([]);
     const [redoSnapshot, setRedoSnapshot] = useState<EditState[]>([]);
     const [nodes, setNodes, onNodesChange] = useNodesState(flow.nodes);
@@ -85,6 +86,7 @@ export const DiagramComponent: FC<{
 
     const [editNode, setEditNode] = useState<GnomonNode | null>(null);
     const [editNodeVisible, setEditNodeVisible] = useState(false);
+    // context menu
     const { show: showNodeContextMenu } = useContextMenu({
         id: NODE_MENU_ID
     });
@@ -130,7 +132,7 @@ export const DiagramComponent: FC<{
             setRedoSnapshot([]);
             setUndoSnapshot([]);
             dispatch(setActiveFlow(updatedFlow));
-            navigate('/editor');
+            navigate('/');
         } else if (control === ControlType.Undo) {
             const snap = undoSnapshot.pop();
             if (snap) {
@@ -146,6 +148,7 @@ export const DiagramComponent: FC<{
             }
         }
     }
+
     const onEdgeContextMenuClick = (control: EdgeContextMenuType, props: any) => {
         if (control === EdgeContextMenuType.Delete) {
             const deleteProps = props as DeleteEdgeProps;
@@ -153,8 +156,8 @@ export const DiagramComponent: FC<{
             setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
         }
     }
-    const onNodeContextMenuItemClick = (control: NodeContextMenuType, props: any) => {
 
+    const onNodeContextMenuItemClick = (control: NodeContextMenuType, props: any) => {
         if (control === NodeContextMenuType.Create) {
             makeUndoSnapshot();
             const current = props as GnomonNode;
@@ -222,9 +225,9 @@ export const DiagramComponent: FC<{
         const id = utils.findNodeId(e.target);
         const find = nodes.find(node => node.id === id);
         if (find) {
+            // TODO
         }
     }
-
 
     const onNodeContextMenu: NodeMouseHandler = (e) => {
         const id = utils.findNodeId(e.target);
@@ -235,6 +238,7 @@ export const DiagramComponent: FC<{
                 props: find
             });
         }
+        e.stopPropagation();
     }
 
     const onEdgeContextMenu: EdgeMouseHandler = (e) => {
@@ -250,18 +254,20 @@ export const DiagramComponent: FC<{
             event: e,
             props: found
         })
+        e.stopPropagation();
     }
 
-    useEffect(() => {
-        onVerticalLayout();
-    }, [])
-
-    const onVerticalLayout = () => {
+    const onVerticalLayout = useCallback(() => {
         ELKLayout(nodes, edges, 'UD').then(v => {
             setNodes(v);
         });
         reactFlowInstance.fitView();
-    }
+    }, [nodes, edges, reactFlowInstance, setNodes])
+
+    useEffect(() => {
+        onVerticalLayout();
+    }, [onVerticalLayout])
+
 
     return <div className="diagram-container" >
         {contextHolder}
@@ -278,9 +284,8 @@ export const DiagramComponent: FC<{
             snapToGrid={true}
             onNodeClick={onNodeClick}
             onContextMenu={(event) => {
-                if (nodes.length === 0) {
-                    showDiagramContextMenu({ event })
-                }
+                showDiagramContextMenu({ event });
+                event.stopPropagation();
             }}
             onNodeContextMenu={onNodeContextMenu}
             onEdgeContextMenu={onEdgeContextMenu}

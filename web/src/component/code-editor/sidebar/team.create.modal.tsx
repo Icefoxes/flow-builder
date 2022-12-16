@@ -1,5 +1,5 @@
 
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { Form, Input, Modal } from 'antd';
 import utils from "../../shared/util";
 import { Team } from "../../../model";
@@ -8,13 +8,23 @@ interface TeamCreateModalProps {
     isModalOpen: boolean;
     handleOk: (team: Team) => void
     toggleVisible: VoidFunction
-    activeTeam?: Team
+    activeTeam: Team | null
 }
 
 export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalOpen, handleOk, toggleVisible }) => {
     const [form] = Form.useForm();
+    useEffect(() => {
+        if (!!!activeTeam) {
+            form.resetFields();
+        }
+        else {
+            form.resetFields();
+            form.setFieldsValue(activeTeam);
+        }
+    }, [activeTeam, form, isModalOpen]);
     return <>
         <Modal title="Team Info"
+            forceRender
             open={isModalOpen}
             onCancel={toggleVisible}
             onOk={() => {
@@ -31,14 +41,6 @@ export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalO
                 })
             }}>
             <Form
-                onLoadedData={e => {
-                    if (activeTeam) {
-                        form.resetFields();
-                        form.setFieldsValue(activeTeam);
-                    } else {
-                        form.resetFields();
-                    }
-                }}
                 form={form}
                 name="team-info"
                 labelCol={{ span: 8 }}

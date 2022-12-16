@@ -16,7 +16,7 @@ export const CodeViewerComponent: FC<{ code: string }> = ({ code }) => {
             style={{
                 fontFamily: '"Fira code", "Fira Mono", monospace',
                 fontSize: 12,
-                maxHeight: '80vh',
+                maxHeight: '85vh',
                 overflowY: 'auto',
                 background: 'black'
             }}

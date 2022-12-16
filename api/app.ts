@@ -1,5 +1,5 @@
 import express, { Express } from 'express';
-import { flowRoute, teamRoute } from './routes';
+import { flowRoute, nodeRoute, teamRoute } from './routes';
 import cors from 'cors';
 import BodyParser from 'body-parser';
 import path from 'path';
@@ -13,6 +13,7 @@ export const createApp = () => {
     app.use(BodyParser.urlencoded({ extended: false }));
     app.use(BodyParser.json());
 
+    app.use('/api/v1/nodes', nodeRoute);
     app.use('/api/v1/flows', flowRoute);
     app.use('/api/v1/teams', teamRoute);
 

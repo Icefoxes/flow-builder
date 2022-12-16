@@ -1,5 +1,4 @@
 import { FC } from "react"
-import { Spin } from "antd";
 import { ReactFlowProvider } from "reactflow";
 
 import { DiagramComponent } from "../../component"
@@ -7,20 +6,14 @@ import { useGetFlowByIdQuery, useUpdateFlowMutation } from "../../service"
 import { Flow } from "../../model";
 
 export const ActiveDiagramContent: FC<{ flow: Flow, isLoading?: boolean }> = ({ flow, isLoading }) => {
-    const [updateFlow, { isLoading: uploadisLoading }] = useUpdateFlowMutation();
+    const [updateFlow] = useUpdateFlowMutation();
 
     return <>
         <ReactFlowProvider>
-            {uploadisLoading && <Spin tip='saving ...' />}
             {(!isLoading && flow) && <>
-
-                <DiagramComponent flow={flow}
-                    onSave={(flow) => {
-                        updateFlow({ flow });
-                    }} />
+                <DiagramComponent key={flow.id} flow={flow} onSave={(f) => updateFlow({ flow: f })} />
             </>}
         </ReactFlowProvider>
-
     </>
 }
 

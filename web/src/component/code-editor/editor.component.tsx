@@ -28,14 +28,17 @@ export interface CodeEditProps {
 
 
 export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoading, activeFlow, sidebarWidth, setActiveFlow }) => {
+    // hooks
     const navigation = useNavigate();
+    // ref
+    const contentRef = useRef<HTMLDivElement>(null);
+
     const [messageApi, contextHolder] = message.useMessage();
     // state
     const [terminalVisible, setTerminalVisible] = useState<boolean>(true);
     const [editorWidth, setEditorWidth] = useState<number>(sidebarWidth);
     const [editor, setEditor] = useState<monacoTypes.editor.IStandaloneCodeEditor | null>(null);
-    // ref
-    const contentRef = useRef<HTMLDivElement>(null);
+
 
     const options = {
         selectOnLineNumbers: false,
@@ -43,7 +46,6 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
 
     const onEditorDidMount: EditorDidMount = (editorParams) => {
         setEditor(editorParams);
-        // onGnomonEditorAmount(editorParams);
 
         editorParams.addAction({
             id: 'Save',
@@ -53,6 +55,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             keybindingContext: undefined,
             contextMenuGroupId: 'Gnomon',
             run(ed: monacoTypes.editor.ICodeEditor): void {
+                onToolbarClick(EditorToolbarControlType.Save);
             }
         });
 
@@ -109,7 +112,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
         }
     }
 
-    const onToolbarClick = (nodeType: EditorToolbarControlType, props: any) => {
+    const onToolbarClick = (nodeType: EditorToolbarControlType, props?: any) => {
         if (nodeType === EditorToolbarControlType.Save) {
             const value = editor?.getModel()?.getValue();
             if (value) {
@@ -143,7 +146,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
             setEditorWidth(width);
             editor?.layout();
         }
-    }, [sidebarWidth])
+    }, [sidebarWidth, setEditorWidth, editor])
 
 
     return <div className="editor-container"

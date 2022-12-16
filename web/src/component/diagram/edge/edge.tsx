@@ -27,7 +27,6 @@ export const UserDefinedEdge = memo<EdgeProps>(({
     });
     const onEdgeClick = (evt: any, id: any) => {
         evt.stopPropagation();
-        alert(`remove ${id}`);
     };
     return <>
         <path

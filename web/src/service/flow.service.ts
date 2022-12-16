@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Flow, FlowLight } from '../model';
+import { Flow, FlowLight, SearchItem } from '../model';
 
 // Define a service using a base URL and expected endpoints
 export const flowApi = createApi({
@@ -39,7 +39,10 @@ export const flowApi = createApi({
                 }
             }
         }),
+        searchNode: builder.query<SearchItem[], { q: string }>({
+            query: ({ q }) => `/nodes/search?q=${q}`
+        })
     }),
 })
 
-export const { useGetFlowsQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;
+export const { useGetFlowsQuery, useLazySearchNodeQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;

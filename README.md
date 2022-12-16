@@ -11,3 +11,6 @@ docker-compose up
 
 ## TODO
 1. read /edit flow mode
+
+## Bug
+1. sidebar toggle, editor not adapt

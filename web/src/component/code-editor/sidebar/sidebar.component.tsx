@@ -15,7 +15,7 @@ import { TeamCreateModal } from "./team.create.modal";
 
 import { useCreateFlowMutation, useCreateTeamMutation, useDeleteFlowMutation, useDeleteTeamMutation, useUpdateTeamMutation, useLazyGetFlowByIdQuery } from "../../../service";
 
-import { FlowLight, Team } from "../../../model";
+import { Flow, FlowLight, Team } from "../../../model";
 import utils from "../../shared/util";
 
 
@@ -27,10 +27,13 @@ interface EditorSidebarProps {
     flows: FlowLight[];
 }
 
+interface EditorSidebarModalState {
+    activeTeam: Team | null,
+    teamCreateModalVisible: boolean
+}
 
 export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows }) => {
-    // data
-
+    // serivce
     const [createTeam] = useCreateTeamMutation();
     const [updateTeam] = useUpdateTeamMutation();
     const [deleteTeam] = useDeleteTeamMutation();
@@ -48,8 +51,11 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
     });
 
     // state
-    const [teamCreateModalVisible, setTeamCreateModalVisible] = useState<boolean>(false);
-    const [activeTeam, setActiveTeam] = useState<Team | null>(null);
+    const [modalState, setModalState] = useState<EditorSidebarModalState>({
+        activeTeam: null,
+        teamCreateModalVisible: false
+    });
+
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         // TODO
         console.log('selected', selectedKeys, info);
@@ -77,8 +83,14 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         } else if (item === FlowContextMenuType.Copy) {
             const flow = props as FlowLight;
             getFlowById({ id: flow.id }).unwrap().then(data => {
+                let text = JSON.stringify(data);
+                data?.nodes.forEach(n => {
+                    const id = utils.newUUID();
+                    text = text.replaceAll(n.id, id);
+                });
+                const copiedFlow = JSON.parse(text) as Flow;
                 createFlow({
-                    flow: Object.assign({}, data, {
+                    flow: Object.assign({}, copiedFlow, {
                         _id: undefined,
                         id: utils.newUUID(),
                         name: 'TO_BE_REPLACED',
@@ -91,9 +103,10 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
 
     const onTeamContextMenu = (item: TeamContextMenuType, props?: any) => {
         if (item === TeamContextMenuType.AddTeam) {
-            setActiveTeam(null);
-            setTeamCreateModalVisible(true);
-            return;
+            setModalState({
+                activeTeam: null,
+                teamCreateModalVisible: true
+            });
         }
         else if (item === TeamContextMenuType.AddFlow) {
             const { id } = props;
@@ -101,6 +114,11 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         }
         else if (item === TeamContextMenuType.DeleteTeam) {
             const team = props as Team;
+            const flowsNotDeleted = flows.find(f => f.team === team.id);
+            if (flowsNotDeleted) {
+                message.error(`please delete all flows under ${team.name} first`);
+                return;
+            }
             Modal.confirm({
                 title: 'Confirm',
                 icon: <ExclamationCircleOutlined />,
@@ -115,8 +133,10 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         }
         else if (item === TeamContextMenuType.EditTeam) {
             const team = props as Team;
-            setActiveTeam(team);
-            setTeamCreateModalVisible(true);
+            setModalState({
+                activeTeam: team,
+                teamCreateModalVisible: true
+            });
         }
     }
 
@@ -126,7 +146,9 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         } else {
             createTeam(team);
         }
-        setTeamCreateModalVisible(false);
+        setModalState(Object.assign({}, modalState, {
+            teamCreateModalVisible: false
+        }));
     }
 
     const generateTreeData = () => {
@@ -137,7 +159,8 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                     showTeamContextMenu({
                         event: e,
                         props: { source: 'tree', ...team }
-                    })
+                    });
+                    e.stopPropagation();
                 }}>
                     <FcFolder className="prefix" />   {team.name}
                 </div>,
@@ -145,12 +168,17 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                 isLeaf: false,
                 children: [...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
                     return {
-                        title: () => <div className="gnomon-tree-node" onContextMenu={e => {
-                            showFlowContextMenu({
-                                event: e,
-                                props: flow
-                            });
-                        }}>
+                        title: () => <div className="gnomon-tree-node"
+                            onDoubleClick={() => [
+                                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                            ]}
+                            onContextMenu={e => {
+                                showFlowContextMenu({
+                                    event: e,
+                                    props: flow
+                                });
+                                e.stopPropagation();
+                            }}>
                             <FcBarChart className="prefix" /> {flow.name}
                         </div>,
                         key: `${flow.id}`,
@@ -163,14 +191,19 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
                         </div>,
                         key: `${tag}`,
                         isLeaf: false,
-                        children: [...flows.filter(flow => flow.tag === tag).map(flow => {
+                        children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
                             return {
-                                title: () => <div className="gnomon-tree-node" onContextMenu={e => {
-                                    showFlowContextMenu({
-                                        event: e,
-                                        props: flow
-                                    });
-                                }}>
+                                title: () => <div className="gnomon-tree-node"
+                                    onDoubleClick={() => [
+                                        getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                    ]}
+                                    onContextMenu={e => {
+                                        showFlowContextMenu({
+                                            event: e,
+                                            props: flow
+                                        });
+                                        e.stopPropagation();
+                                    }}>
                                     <FcBarChart className="prefix" /> {flow.name}
                                 </div>,
                                 key: `${flow.id}`,
@@ -193,9 +226,11 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows })
         <FlowContextMenu onItemClick={onFlowContextMenu} />
         <TeamContextMenu onItemClick={onTeamContextMenu} />
         <TeamCreateModal
-            activeTeam={activeTeam as Team}
+            activeTeam={modalState.activeTeam}
             handleOk={onTeamCreateModal}
-            isModalOpen={teamCreateModalVisible}
-            toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
+            isModalOpen={modalState.teamCreateModalVisible}
+            toggleVisible={() => setModalState(Object.assign({}, modalState, {
+                teamCreateModalVisible: !modalState.teamCreateModalVisible
+            }))} />
     </>
 }

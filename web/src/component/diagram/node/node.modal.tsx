@@ -40,9 +40,10 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
     useEffect(() => {
         form.resetFields();
         form.setFieldsValue(node.data);
-    }, [node, form]);
+    }, [node, form, isModalOpen]);
 
     return <Modal
+        forceRender
         title={
             <div
                 style={{
