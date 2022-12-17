@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { notification, Tooltip } from "antd";
 import {
     CopyOutlined
@@ -13,6 +13,7 @@ import kdb from '../../../asset/kdb.svg';
 import solace from '../../../asset/solace.png';
 import './node.scss';
 import { NodeData, NodeType } from "../../../model";
+import { checkRequired } from "./node.modal";
 
 const getIcon = (type: NodeType) => {
     switch (type) {
@@ -91,142 +92,6 @@ export const getType = (type: NodeType) => {
     }
 }
 
-export enum AdditionalInfoType {
-    Input = 'Input',
-    Selection = 'Selection',
-    CheckBox = 'CheckBox',
-    TextArea = 'TextArea',
-}
-
-interface AdditionalInfo {
-    // for check box
-    default?: boolean | string;
-    // for selections
-    selections?: string[]
-
-    // common
-    type: AdditionalInfoType;
-    name: string;
-    required: boolean;
-}
-
-
-export const getBasicInfo = () => {
-    return [
-        {
-            name: 'Label',
-            required: true,
-            type: AdditionalInfoType.Input,
-
-        },
-        {
-            name: 'Description',
-            required: false,
-            type: AdditionalInfoType.Input,
-
-        },
-        {
-            name: 'Redirect',
-            required: false,
-            type: AdditionalInfoType.Input,
-
-        },
-        {
-            name: 'Reposiotry',
-            required: false,
-            type: AdditionalInfoType.Input,
-
-        },
-    ] as AdditionalInfo[]
-}
-
-export const getAdditionalInfo = (type: NodeType) => {
-    switch (type) {
-        case NodeType.Flink:
-            return [
-                {
-                    name: 'Cluster',
-                    required: true,
-                    type: AdditionalInfoType.Selection,
-                    selections: ['ClusterA', 'ClusterB'],
-                    default: 'ClusterA'
-                },
-                {
-                    name: 'Venv',
-                    required: true,
-                    type: AdditionalInfoType.CheckBox,
-                    default: true
-                }] as AdditionalInfo[]
-        case NodeType.Redhat:
-            return [{
-                name: 'Machine',
-                required: true,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'Actuator',
-                required: false,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'Autosys',
-                required: false,
-                type: AdditionalInfoType.TextArea
-            },
-            ] as AdditionalInfo[];
-        case NodeType.StoreProcedure:
-            return [{
-                name: 'Persistence',
-                required: true,
-                type: AdditionalInfoType.CheckBox
-            },
-            {
-                name: 'SP',
-                required: false,
-                type: AdditionalInfoType.TextArea
-            }] as AdditionalInfo[];
-        case NodeType.Kafka:
-            return [{
-                name: 'Region',
-                required: true,
-                selections: ['NY', 'MW'],
-                default: 'NY',
-                type: AdditionalInfoType.Selection
-            },
-            {
-                name: 'MessageType',
-                required: true,
-                selections: ['AVRO', 'STRING'],
-                default: 'AVRO',
-                type: AdditionalInfoType.Selection
-            },
-            {
-                name: 'Jar',
-                required: false,
-                type: AdditionalInfoType.Input
-            }] as AdditionalInfo[];
-        case NodeType.HBase:
-            return [{
-                name: 'Namespace',
-                required: true,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'MessageType',
-                required: true,
-                selections: ['AVRO', 'STRING', 'JSON'],
-                default: 'AVRO'
-            }] as AdditionalInfo[];
-        case NodeType.S3:
-            return [{
-                name: 'Bucket',
-                required: true,
-                type: AdditionalInfoType.Input
-            }] as AdditionalInfo[];
-        default:
-            return [] as AdditionalInfo[];
-    }
-}
 
 export const NodeConfig = {
     Width: 300,
@@ -238,15 +103,25 @@ const trim = (str: string) => {
     return str.length > 60 ? `${str.substring(0, 30)}...${str.substring(str.length - 30, str.length)}` : str;
 }
 
-export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { label, description, nodeType }, id }) => {
+
+export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data, id }) => {
+    const { label, description, nodeType } = data;
+
+    const isComplete = React.useCallback(() => {
+        return checkRequired(data);
+    }, [data])
+
     return <div className="node-root" data-id={id}>
         <Handle
             position={Position.Top}
-            type={'source'}
+            type={'target'}
             id={Position.Top}
             style={{ background: '#555' }}
         />
-        <div className="text-container" style={{ borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px' }}>
+        <div className="text-container" style={{
+            borderRadius: getType(nodeType) === NodeTypePerBusiness.Processor ? '15px' : '0px',
+            borderColor: isComplete() ? 'black' : 'red'
+        }}>
             <div style={{ width: 'fit-content' }} >
                 <Textfit className="text-label" mode="single" max={10} forceSingleModeWidth={true}>
                     <Tooltip title={label} style={{ width: 'fit-content' }}>
@@ -275,7 +150,7 @@ export const UserDefinedNode = memo<{ data: NodeData, id: string }>(({ data: { l
         <Handle
             position={Position.Bottom}
             id={Position.Bottom}
-            type="target"
+            type="source"
             style={{ background: '#555' }}
         />
 
