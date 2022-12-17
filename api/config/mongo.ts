@@ -10,7 +10,7 @@ const dbName = 'gnomon';
 export function getDb() {
     // Use connect method to connect to the server
     client.connect();
-    console.log('Connected successfully to server');
+    console.log('Connected successfully to mongodb');
     const db = client.db(dbName);
     return db;
 }
@@ -78,5 +78,13 @@ export const teamApi = {
     },
     findAll: () => {
         return teams.find().toArray();
+    },
+    getTeamOverview: (teamId: string) => {
+        return flows.aggregate([
+            { $match: { team: teamId } },
+            { $unwind: "$nodes" },
+            { $project: { name: "$nodes.data.label", type: "$nodes.data.nodeType" }, _id: 0 },
+            { $group: { _id: "$type", count: { $sum: 1 } } }
+        ]).toArray();
     }
 }

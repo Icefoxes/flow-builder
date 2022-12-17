@@ -10,7 +10,7 @@ import { Flow } from "../../../model";
 
 export enum EditorToolbarControlType {
     Save = 'Save',
-    Edit = 'Edit'
+    GoToDiagram = 'GoToDiagram'
 }
 
 interface EditorToolBarProps {
@@ -30,7 +30,7 @@ export const EditorToolBarComponent: FC<EditorToolBarProps> = ({ onClick, isLoad
             </Tooltip>
 
             <Tooltip title="Go to Diagram">
-                <ApartmentOutlined className="toolbar-icon" onClick={() => onClick(EditorToolbarControlType.Edit)} />
+                <ApartmentOutlined className="toolbar-icon" onClick={() => onClick(EditorToolbarControlType.GoToDiagram)} />
             </Tooltip>
         </div>
 

@@ -6,6 +6,7 @@
     "@react-hook/debounce": "^4.0.0",
     "@reduxjs/toolkit": "^1.9.1",
     "antd": "^5.0.4",
+    "dagre": "^0.8.5",
     "elkjs": "^0.8.2",
     "moment": "^2.29.4",
     "prismjs": "^1.29.0",
@@ -44,6 +45,7 @@
     "@types/react-dom": "^18.0.9",
     "@types/react-textfit": "^1.1.0",
     "@types/uuid": "^9.0.0",
+    "@types/dagre": "^0.7.48",
     "lint-staged": "^13.1.0",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "react-app-rewired": "^2.2.1"

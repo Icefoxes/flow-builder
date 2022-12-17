@@ -137,7 +137,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
                     messageApi.error('please select one Flow first');
                 }
             }
-        } else if (nodeType === EditorToolbarControlType.Edit) {
+        } else if (nodeType === EditorToolbarControlType.GoToDiagram) {
             const value = editor?.getModel()?.getValue();
             if (value) {
                 const flow = JSON.parse(value) as Flow;

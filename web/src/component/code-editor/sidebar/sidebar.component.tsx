@@ -59,7 +59,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
 
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         // TODO
-        console.log('selected', selectedKeys, info);
+        // console.log('selected', selectedKeys, info);
     };
 
     const onFlowContextMenu = (item: FlowContextMenuType, props?: any) => {
@@ -80,7 +80,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 cancelText: 'Cancel',
                 onOk: () => {
                     deleteFlow({ flow });
-                    message.success(`deleted ${flow.name}`);
+                    message.success(`deleted flow ${flow.name}`);
                 }
             });
         } else if (item === FlowContextMenuType.Copy) {
@@ -130,7 +130,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 cancelText: 'Cancel',
                 onOk: () => {
                     deleteTeam(team);
-                    message.success(`deleted ${team.name}`);
+                    message.success(`deleted team ${team.name}`);
                 }
             });
         }

@@ -49,6 +49,7 @@ https://momentjs.com/
 * add node
 * change node type
 * edit node info
+* check all node info and default value
 * add three nodes and name as account
 * connect them
 * delete one node

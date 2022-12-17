@@ -7,7 +7,6 @@ import path from 'path';
 export const createApp = () => {
     const app: Express = express();
     app.use(cors());
-    console.log(path.join(__dirname, 'public'));
     app.use('/', express.static(path.join(__dirname, 'public')));
     app.use(express.static(path.join(__dirname, 'public')))
     app.use(BodyParser.urlencoded({ extended: false }));
