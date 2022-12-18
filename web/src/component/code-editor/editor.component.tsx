@@ -13,7 +13,7 @@ import './editor.component.scss';
 import { TerminalComponent } from './terminal';
 import { EditorToolBarComponent, EditorToolbarControlType } from './toolbar';
 import { onMonacoWillMount } from "./editor.before.mount";
-import { Flow, NodeType } from "../../model";
+import { Flow } from "../../model";
 import utils from "../shared/util";
 import { EditorActionKind, visibleReducer } from "./editor.reducer";
 
@@ -102,7 +102,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
         const editText = editor?.getModel()?.getValue();;
 
         if (editText && nodeType) {
-            const found = Object.values(NodeType).find(f => f.toLowerCase() === nodeType.toLowerCase());
+            const found = utils.getNodeMetaData().find(f => f.toLowerCase() === nodeType.toLowerCase());
             if (found) {
                 let flow = JSON.parse(editText) as Flow;
                 if (flow) {
@@ -137,7 +137,7 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
                     messageApi.error('please select one Flow first');
                 }
             }
-        } else if (nodeType === EditorToolbarControlType.Edit) {
+        } else if (nodeType === EditorToolbarControlType.GoToDiagram) {
             const value = editor?.getModel()?.getValue();
             if (value) {
                 const flow = JSON.parse(value) as Flow;

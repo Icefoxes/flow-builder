@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CodeEditComponent, CodeEditProps, EditorSidebarComponent, TeamCreateModal, TEAM_SIDEBAR_MENU } from "../../component/code-editor"
 import { selectActiveFlow, selectFlows, selectTeams, setActiveFlow } from "./adminSlice";
-import { useCreateTeamMutation, useGetFlowsQuery, useGetTeamsQuery, useUpdateFlowMutation } from "../../service";
+import { useCreateTeamMutation, useGetFlowsQuery, useGetMetaQuery, useGetTeamsQuery, useUpdateFlowMutation } from "../../service";
 import './editor.page.scss';
 import { useContextMenu } from "react-contexify";
 import { Team } from "../../model";
@@ -16,6 +16,7 @@ const EditorPage: FC = () => {
     const disptach = useDispatch();
     useGetTeamsQuery({});
     useGetFlowsQuery();
+    useGetMetaQuery();
     const activeFlow = useSelector(selectActiveFlow);
     const teams = useSelector(selectTeams);
 

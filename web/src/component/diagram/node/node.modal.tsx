@@ -1,12 +1,47 @@
 
 import { FC, useEffect, useRef, useState } from "react";
-import { Form, Input, Select, Modal, Checkbox } from 'antd';
+import { Form, Input, Select, Modal, Checkbox, Button, Space } from 'antd';
+import {
+    MinusCircleOutlined,
+    PlusOutlined
+} from '@ant-design/icons';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Draggable from 'react-draggable';
-import { GnomonNode, NodeData } from "../../../model";
-import { AdditionalInfoType, getAdditionalInfo, getBasicInfo } from './node';
+import { AttributeInfo, AttributeType, GnomonNode, NodeData } from "../../../model";
+import utils from "../../shared/util";
 
 const { TextArea } = Input;
+
+
+
+const getBasicInfo = () => {
+    return [
+        {
+            name: 'Label',
+            required: true,
+            type: AttributeType.Input,
+
+        },
+        {
+            name: 'Description',
+            required: false,
+            type: AttributeType.Input,
+
+        },
+        {
+            name: 'Redirect',
+            required: false,
+            type: AttributeType.Input,
+
+        },
+        {
+            name: 'Reposiotry',
+            required: false,
+            type: AttributeType.Input,
+
+        },
+    ] as AttributeInfo[]
+}
 
 interface NodeModalProps {
     node: GnomonNode,
@@ -14,15 +49,113 @@ interface NodeModalProps {
     handleOk: (data: GnomonNode) => void,
     toggleVisible: VoidFunction
 }
+/*
+-- Root
+    property:
+        0:
+            - field 1
+            - field 2
+ */
+const AdditionalInfoList = (name: string, label: string, infos: AttributeInfo[]) => (
+    <Form.List key={name} name={`${name}`}>
+        {(fields, { add, remove }) => (
+            <>
+                {fields.map((field) => (
+                    <Space key={name} align="baseline">
+                        {infos.map(info => {
+                            const fieldName = info.property ? info.property : info.name.toLowerCase();
+                            const props = {
+                                key: `${field.name}-${fieldName}`,
+                                name: [field.name, fieldName],
+                                label: info.name,
+                                rules: [{ required: info.required, message: `Please input your ${info.name}` }]
+                            };
 
+
+                            if (info.type === AttributeType.Input) {
+                                return <>
+                                    <Form.Item {...props}>
+                                        <Input placeholder={`input ${info.name}`} />
+                                    </Form.Item>
+                                </>
+                            }
+                            else if (info.type === AttributeType.Selection && info.selections) {
+                                return <>
+                                    <Form.Item {...props}>
+                                        <Select>
+                                            {info.selections.map(opt => <Select.Option key={`${info.name}-${opt}`} value={opt}>{opt}</Select.Option>)}
+                                        </Select>
+                                    </Form.Item>
+                                </>
+                            }
+                            else if (info.type === AttributeType.CheckBox) {
+                                return <>
+                                    <Form.Item {...props} valuePropName="checked">
+                                        <Checkbox defaultChecked={true} />
+                                    </Form.Item>
+                                </>
+                            }
+                            return <>
+                                <Form.Item {...props} noStyle>
+                                </Form.Item>
+                            </>
+                        })}
+                        <MinusCircleOutlined style={{ margin: '8px 0 0 0' }} onClick={() => remove(field.name)} />
+                    </Space>
+                ))}
+
+                <Form.Item>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        Add {label}
+                    </Button>
+                </Form.Item>
+            </>
+        )}
+    </Form.List>
+)
+
+const getInitValues = (type: string) => {
+    const infos = getBasicInfo().concat(utils.getNodeMetaDataByType(type)).filter(f => !!f.default);
+    let obj = {}
+    infos.forEach(info => {
+        const fieldName = info.property ? info.property : info.name.toLowerCase();
+        obj = Object.assign({}, obj, {
+            [fieldName]: info.default
+        })
+    });
+    return obj;
+}
+
+export const getFields = (type: string) => {
+    return getBasicInfo().concat(utils.getNodeMetaDataByType(type)).map(info => info.property ? info.property : info.name.toLowerCase());
+}
+
+export const getDiff = (previous: string, next: string) => {
+    const after = getFields(next);
+    let obj = {};
+    getFields(previous).filter(x => after.indexOf(x) < 0).forEach(f => {
+        obj = Object.assign({}, obj, {
+            [f]: undefined
+        })
+    });
+    return obj;
+}
+
+export const checkRequired = (data: NodeData) => {
+    const properties = getBasicInfo().concat(utils.getNodeMetaDataByType(data.nodeType)).filter(f => f.required).map(info => info.property ? info.property : info.name.toLowerCase());
+    return !!!properties.find(pro => !!!(data as any)[pro])
+}
 
 export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisible, handleOk, node }) => {
+    const nodeType = node.data.nodeType;
+    // hooks
     const [form] = Form.useForm();
-
+    // state
     const [disabled, setDisabled] = useState(false);
     const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
+    // ref
     const draggleRef = useRef<HTMLDivElement>(null)
-
+    // functions
     const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
         const { clientWidth, clientHeight } = window.document.documentElement;
         const targetRect = draggleRef.current?.getBoundingClientRect();
@@ -37,95 +170,116 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
         });
     };
 
+    const modalTitle = (
+        <div
+            style={{
+                width: '100%',
+                height: '40px',
+                cursor: 'move',
+            }}
+            onMouseOver={() => {
+                if (disabled) {
+                    setDisabled(false);
+                }
+            }}
+            onMouseOut={() => {
+                setDisabled(true);
+            }}
+            onFocus={() => { }}
+            onBlur={() => { }} >
+            Node Info
+        </div>
+    );
+
+    const modalRender = (modal: React.ReactNode) => {
+        return <>
+            <Draggable
+                disabled={disabled}
+                bounds={bounds}
+                onStart={(event, uiData) => onStart(event, uiData)}>
+                <div ref={draggleRef}>{modal}</div>
+            </Draggable>
+        </>
+    }
+
     useEffect(() => {
         form.resetFields();
         form.setFieldsValue(node.data);
     }, [node, form, isModalOpen]);
 
+    const onOk = () => {
+        form.validateFields()
+            .then(v => {
+                const data = v as NodeData;
+                if (data) {
+                    handleOk(Object.assign({}, node, {
+                        data: Object.assign({}, node.data, {
+                            ...data
+                        })
+                    }));
+                    toggleVisible();
+                }
+            });
+    }
+
     return <Modal
         forceRender
         keyboard
-        title={
-            <div
-                style={{
-                    width: '100%',
-                    cursor: 'move',
-                }}
-                onMouseOver={() => {
-                    if (disabled) {
-                        setDisabled(false);
-                    }
-                }}
-                onMouseOut={() => {
-                    setDisabled(true);
-                }}
-                onFocus={() => { }}
-                onBlur={() => { }} >
-                Node Info
-            </div>
-        }
-        modalRender={(modal) => (
-            <Draggable
-                disabled={disabled}
-                bounds={bounds}
-                onStart={(event, uiData) => onStart(event, uiData)}
-            >
-                <div ref={draggleRef}>{modal}</div>
-            </Draggable>
-        )}
+        title={modalTitle}
+        modalRender={modalRender}
         open={isModalOpen}
-        onOk={() => {
-            form.validateFields()
-                .then(v => {
-                    const data = v as NodeData;
-                    if (data) {
-                        handleOk(Object.assign({}, node, {
-                            data: Object.assign({}, node.data, {
-                                ...data
-                            })
-                        }));
-                        toggleVisible();
-                    }
-                });
-        }}
+        onOk={onOk}
         onCancel={toggleVisible}>
         <Form
             autoComplete="off"
+            initialValues={getInitValues(nodeType)}
             form={form}>
-            {getBasicInfo().concat(getAdditionalInfo(node.data.nodeType)).map(info => {
-                if (info.type === AdditionalInfoType.Input) {
+            {getBasicInfo().concat(utils.getNodeMetaDataByType(nodeType)).map(info => {
+                const fieldName = info.property ? info.property : info.name.toLowerCase();
+                const props = {
+                    key: `${node.id}-${fieldName}`,
+                    name: fieldName,
+                    label: info.name,
+                    rules: [{ required: info.required, message: `Please input your ${info.name}` }]
+                };
+
+                if (info.type === AttributeType.Input) {
                     return <>
-                        <Form.Item key={info.name} label={info.name} name={info.name.toLowerCase()} rules={[{ required: info.required, message: `Please input your ${info.name}` }]}>
+                        <Form.Item {...props} >
                             <Input placeholder={`input ${info.name}`} />
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.Selection) {
+                else if (info.type === AttributeType.Selection && info.selections) {
                     return <>
-                        <Form.Item key={info.name} label={info.name} name={info.name.toLowerCase()} rules={[{ required: info.required, message: `Please input your ${info.name}` }]}>
+                        <Form.Item {...props} >
                             <Select>
-                                {(info.selections as string[]).map(node => <Select.Option key={`${info.name}-${node}`} value={node}>{node}</Select.Option>)}
+                                {(info.selections).map(opt => <Select.Option key={`${node.id}-${fieldName}-${opt}`} value={opt}>{opt}</Select.Option>)}
                             </Select>
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.CheckBox) {
+                else if (info.type === AttributeType.CheckBox) {
                     return <>
-                        <Form.Item key={info.name} label={info.name} name={info.name.toLowerCase()} valuePropName="checked">
-                            <Checkbox defaultChecked={info.default as boolean} />
+                        <Form.Item {...props} valuePropName="checked">
+                            <Checkbox defaultChecked={true} />
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.TextArea) {
+                else if (info.type === AttributeType.TextArea) {
                     return <>
-                        <Form.Item key={info.name} label={info.name} name={info.name.toLowerCase()}>
+                        <Form.Item {...props}>
                             <TextArea rows={4} />
                         </Form.Item>
                     </>
                 }
+                else if (info.type === AttributeType.ListObject && info.children) {
+                    return <>
+                        {AdditionalInfoList(info.name, info.name, info.children)}
+                    </>
+                }
                 return <></>
-            })
-            }
+            })}
         </Form>
     </Modal>
 }

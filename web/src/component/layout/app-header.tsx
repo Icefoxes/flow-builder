@@ -48,8 +48,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
         });
 
     const handleSearch = (q: string) => {
-        console.log(q);
-        if (q && q.length > 4) {
+        if (q && q.length >= 3) {
             searchNode({ q }).unwrap()
                 .then(nodes => {
                     setOptions(searchResult(q, nodes));

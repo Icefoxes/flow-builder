@@ -25,15 +25,15 @@ import { NodeConfig, UserDefinedNode } from "./node";
 import { NodeContextMenuType, ChangeNodeProps, NODE_MENU_ID, NodeContextMenu } from './node/node.context-menu';
 import { UserDefinedEdge } from "./edge";
 import { DeleteEdgeProps, EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
-import { Flow, GnomonNode, NodeType } from "../../model";
+import { Flow, GnomonNode } from "../../model";
 
 import Utils from '../shared/util';
 import { ControlType, DiagramToolBarComponent } from "./toolbar/diagram.toolbar";
 import { setActiveFlow } from '../../feature/admin/adminSlice';
-import { NodeModalComponent } from "./node/node.modal";
-import { ELKLayout } from "./elk";
+import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
+import { getDagreLayoutedElements } from "./dagre";
 
 
 
@@ -52,7 +52,7 @@ const newNode = (nodes: Node<any>[], id: string) => {
         id: id,
         data: {
             label: 'New node',
-            nodeType: NodeType.Kafka
+            nodeType: 'Kafka'
         },
         position: {
             x: x_max + NodeConfig.Width + NodeConfig.NodeSpace,
@@ -78,11 +78,17 @@ export const DiagramComponent: FC<{
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const reactFlowInstance = useReactFlow();
+
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
+        flow.nodes,
+        flow.edges
+    );
+
     // state
     const [undoSnapshot, setUndoSnapshot] = useState<EditState[]>([]);
     const [redoSnapshot, setRedoSnapshot] = useState<EditState[]>([]);
-    const [nodes, setNodes, onNodesChange] = useNodesState(flow.nodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(flow.edges);
+    const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
     const [editNode, setEditNode] = useState<GnomonNode | null>(null);
     const [editNodeVisible, setEditNodeVisible] = useState(false);
@@ -173,9 +179,11 @@ export const DiagramComponent: FC<{
             makeUndoSnapshot();
             const data = props as ChangeNodeProps;
             const found = nodes.find(node => node.id === data.id) as Node;
+            const diff = getDiff(found.data.nodeType, data.type);
             setNodes([...nodes.filter(node => node.id !== data.id), Object.assign({}, found, {
                 data: Object.assign({}, found.data, {
-                    nodeType: data.type
+                    nodeType: data.type,
+                    ...diff
                 })
             })]);
         }
@@ -204,13 +212,15 @@ export const DiagramComponent: FC<{
         else if (control === NodeContextMenuType.Copy) {
             const node = props as GnomonNode;
             makeUndoSnapshot();
-            setNodes([...nodes, Object.assign({}, node, {
+            setNodes([...nodes, {
                 id: Utils.newUUID(),
                 position: {
                     x: node.position.x,
                     y: node.position.y + 100,
-                }
-            })]);
+                },
+                data: node.data,
+                type: node.type
+            } as Node<any>]);
         }
     }
 
@@ -257,17 +267,22 @@ export const DiagramComponent: FC<{
         e.stopPropagation();
     }
 
-    const onVerticalLayout = () => {
-        ELKLayout(nodes, edges, 'UD').then(v => {
-            setNodes(v);
-        });
-        reactFlowInstance.fitView();
-    }
-
     useEffect(() => {
-        onVerticalLayout();
+        onDagreLayout('TB');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const onDagreLayout = (direction: string) => {
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
+            nodes,
+            edges,
+            direction
+        );
+
+        setNodes([...layoutedNodes]);
+        setEdges([...layoutedEdges]);
+        reactFlowInstance.fitView();
+    };
 
     return <div className="diagram-container" >
         {contextHolder}
@@ -293,7 +308,7 @@ export const DiagramComponent: FC<{
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}>
             <Controls>
-                <ColumnHeightOutlined className="gnomon-diagram-control-icons" style={{ width: '100%', height: '100%' }} onClick={onVerticalLayout} />
+                <ColumnHeightOutlined className="gnomon-diagram-control-icons" style={{ width: '100%', height: '100%' }} onClick={() => onDagreLayout('TB')} />
             </Controls>
             <Background />
         </ReactFlow>

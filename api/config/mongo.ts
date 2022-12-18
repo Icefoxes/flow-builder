@@ -1,6 +1,5 @@
-import { MongoClient } from 'mongodb'
-import { Flow } from '../model';
-import { Team } from '../model/team.model';
+import { MongoClient, ObjectId, OptionalId, WithId } from 'mongodb'
+import { Flow, NodeTypeMeta, Team } from '../model';
 
 const url = process.env.ME_CONFIG_MONGODB_URL || 'mongodb://localhost:27017';
 const client = new MongoClient(url);
@@ -10,7 +9,7 @@ const dbName = 'gnomon';
 export function getDb() {
     // Use connect method to connect to the server
     client.connect();
-    console.log('Connected successfully to server');
+    console.log('Connected successfully to mongodb');
     const db = client.db(dbName);
     return db;
 }
@@ -19,6 +18,7 @@ const db = getDb();
 
 const flows = db.collection('flows');
 const teams = db.collection('teams');
+const metas = db.collection('metas');
 
 export const flowApi = {
     addFlow: (flow: Flow) => {
@@ -78,5 +78,33 @@ export const teamApi = {
     },
     findAll: () => {
         return teams.find().toArray();
+    },
+    getTeamOverview: (teamId: string) => {
+        return flows.aggregate([
+            { $match: { team: teamId } },
+            { $unwind: "$nodes" },
+            { $project: { name: "$nodes.data.label", type: "$nodes.data.nodeType" }, _id: 0 },
+            { $group: { _id: "$type", count: { $sum: 1 } } }
+        ]).toArray();
+    }
+}
+
+export const metaApi = {
+    findAll: () => {
+        return metas.find().toArray();
+    },
+    findMetaById: (id: string) => {
+        return metas.findOne({ _id: new ObjectId(id) });
+    },
+    addMeta: (meta: OptionalId<NodeTypeMeta>) => {
+        return metas.insertOne(meta);
+    },
+    updateMeta: (meta: WithId<NodeTypeMeta>) => {
+        const id = new ObjectId(meta._id);
+        delete (meta as any)['_id'];
+        return metas.updateOne({ _id: id }, { $set: { ...meta } });
+    },
+    deleteMeta: (meta: WithId<NodeTypeMeta>) => {
+        return metas.deleteOne({ _id: new ObjectId(meta._id) });
     }
 }

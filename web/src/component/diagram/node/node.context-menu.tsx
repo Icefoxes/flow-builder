@@ -6,13 +6,14 @@ import {
     Submenu,
 
 } from "react-contexify";
-import { GnomonNode, NodeType } from "../../../model";
+import { GnomonNode } from "../../../model";
+import utils from "../../shared/util";
 
 export const NODE_MENU_ID = "NODE-MENU";
 
 export interface ChangeNodeProps {
     id: string;
-    type: NodeType;
+    type: string;
 }
 
 export enum NodeContextMenuType {
@@ -55,7 +56,7 @@ export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, prop
 
             <Separator />
             <Submenu key='change-type' label="Change Type">
-                {Object.values(NodeType).map(nodeType => {
+                {utils.getNodeMetaData().map(nodeType => {
                     return (
                         <Item
                             key={nodeType}

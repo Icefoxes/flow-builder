@@ -1,5 +1,5 @@
 import { Edge, Node } from "reactflow";
-import { Flow, GnomonEdge, GnomonNode, NodeData } from "../../model";
+import { AttributeInfo, Flow, GnomonEdge, GnomonNode, NodeData, NodeTypeMeta } from "../../model";
 import { v4 as uuidv4 } from 'uuid';
 
 const round = (num: number) => Math.round(num * 100) / 100
@@ -63,6 +63,13 @@ const findNodeId = (event: EventTarget) => {
     return null;
 }
 
+const getNodeMetaData = () => {
+    return (JSON.parse(localStorage.getItem('META') || '[]') as NodeTypeMeta[]).map(f => f.name);
+}
+
+const getNodeMetaDataByType = (name: string) => {
+    return (JSON.parse(localStorage.getItem('META') || '[]') as NodeTypeMeta[]).find(x => x.name === name)?.attributes as AttributeInfo[];
+}
 
 const newFlow = (id: string) => {
     return {
@@ -79,7 +86,10 @@ const utils = {
     newUUID,
     findEdgeId,
     findNodeId,
-    newFlow
+    newFlow,
+    getNodeMetaDataByType,
+    getNodeMetaData,
+    
 }
 
 export default utils;

@@ -6,7 +6,7 @@ import { FcFolder, FcBriefcase, FcBarChart } from 'react-icons/fc';
 import {
     ExclamationCircleOutlined,
 } from '@ant-design/icons';
-
+import { useNavigate } from "react-router-dom";
 import './sidebar.component.scss';
 
 import { FlowContextMenu, FlowContextMenuType, FLOW_SIDEBAR_MENU } from "./sidebar.flow.context-menu";
@@ -34,6 +34,7 @@ interface EditorSidebarModalState {
 }
 
 export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, activeFlow }) => {
+    const navigate = useNavigate();
     // serivce
     const [createTeam] = useCreateTeamMutation();
     const [updateTeam] = useUpdateTeamMutation();
@@ -59,7 +60,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
 
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         // TODO
-        console.log('selected', selectedKeys, info);
+        // console.log('selected', selectedKeys, info);
     };
 
     const onFlowContextMenu = (item: FlowContextMenuType, props?: any) => {
@@ -80,7 +81,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 cancelText: 'Cancel',
                 onOk: () => {
                     deleteFlow({ flow });
-                    message.success(`deleted ${flow.name}`);
+                    message.success(`deleted flow ${flow.name}`);
                 }
             });
         } else if (item === FlowContextMenuType.Copy) {
@@ -130,7 +131,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 cancelText: 'Cancel',
                 onOk: () => {
                     deleteTeam(team);
-                    message.success(`deleted ${team.name}`);
+                    message.success(`deleted team ${team.name}`);
                 }
             });
         }
@@ -140,6 +141,9 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 activeTeam: team,
                 teamCreateModalVisible: true
             });
+        }
+        else if (item === TeamContextMenuType.EditMeta) {
+            navigate('/meta');
         }
     }
 
