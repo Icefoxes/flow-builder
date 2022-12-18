@@ -23,10 +23,11 @@ teamRoute.post('/', (req: Request, res: Response) => {
 
 teamRoute.patch('/', (req: Request, res: Response) => {
     const team = req.body as Team;
+    const body = Object.assign({}, team)
     if (team) {
         teamApi.updateTeam(team).then(rlt => {
             if (rlt.acknowledged && rlt.modifiedCount === 1) {
-                res.json(team);
+                res.json(body);
             } else {
                 res.status(500);
             }

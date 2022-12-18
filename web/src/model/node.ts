@@ -15,30 +15,8 @@ export interface XYPosition {
     y: number;
 }
 
-export enum NodeType {
-    StoreProcedure = 'StoreProcedure',
-    Flink = "Flink",
-    Redhat = 'Redhat',
-
-    SQLServer = "SQLServer",
-    Kafka = "Kafka",
-    ElasticSearch = "ElasticSearch",
-    HBase = "HBase",
-    KDB = "KDB",
-    CloudKDB = "CloudKDB",
-    Redis = "Redis",
-    S3 = "S3",
-
-    ISGCloud = 'ISGCloud',
-    Rio = 'Rio',
-    Olympus = 'Olympus',
-    PxNET = 'PxNET',
-    Ion = 'Ion',
-    DataHighway = 'DataHighway'
-}
-
 export interface NodeData {
-    nodeType: NodeType,
+    nodeType: string,
     label: string,
     description?: string,
     owner?: string;

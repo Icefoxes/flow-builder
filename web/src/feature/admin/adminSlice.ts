@@ -1,18 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { flowApi, teamApi } from '../../service'
+import { flowApi, metaApi, teamApi } from '../../service'
 import { Flow, FlowLight, Team } from '../../model'
 import { RootState } from '../../store'
+import { NodeTypeMeta } from '../../model/meta';
 
 export interface AdminState {
   activeFlow: Flow | null;
   teams: Team[];
   flows: FlowLight[];
+  nodeMeta: NodeTypeMeta[];
 }
 
 const initialState: AdminState = {
   activeFlow: null,
   teams: [],
   flows: [],
+  nodeMeta: []
 }
 
 const transformToFlowLight = (payload: Flow) => {
@@ -68,6 +71,25 @@ export const adminSlice = createSlice({
     builder.addMatcher(teamApi.endpoints.deleteTeam.matchFulfilled, (state, { payload }) => {
       state.teams = [...state.teams.filter(t => t.id !== payload.id)];
     });
+
+    // meta api
+
+    builder.addMatcher(metaApi.endpoints.getMeta.matchFulfilled, (state, { payload }) => {
+      state.nodeMeta = payload;
+      localStorage.setItem('META', JSON.stringify(state.nodeMeta));
+    });
+    builder.addMatcher(metaApi.endpoints.createMeta.matchFulfilled, (state, { payload }) => {
+      state.nodeMeta = [...state.nodeMeta, payload];
+      localStorage.setItem('META', JSON.stringify(state.nodeMeta));
+    });
+    builder.addMatcher(metaApi.endpoints.updateMeta.matchFulfilled, (state, { payload }) => {
+      state.nodeMeta = [...state.nodeMeta.filter(meta => meta._id !== payload._id), payload];
+      localStorage.setItem('META', JSON.stringify(state.nodeMeta));
+    });
+    builder.addMatcher(metaApi.endpoints.deleteMeta.matchFulfilled, (state, { payload }) => {
+      state.nodeMeta = [...state.nodeMeta.filter(t => t._id !== payload._id)];
+      localStorage.setItem('META', JSON.stringify(state.nodeMeta));
+    });
   },
 })
 
@@ -78,3 +100,5 @@ export const selectActiveFlow = (state: RootState) => state.admin.activeFlow;
 export const selectTeams = (state: RootState) => state.admin.teams;
 
 export const selectFlows = (state: RootState) => state.admin.flows;
+
+export const selectNodeMetaData = (state: RootState) => state.admin.nodeMeta;

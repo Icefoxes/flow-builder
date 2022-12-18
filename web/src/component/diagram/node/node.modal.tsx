@@ -7,169 +7,40 @@ import {
 } from '@ant-design/icons';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Draggable from 'react-draggable';
-import { GnomonNode, NodeData, NodeType } from "../../../model";
+import { AttributeInfo, AttributeType, GnomonNode, NodeData } from "../../../model";
+import utils from "../../shared/util";
 
 const { TextArea } = Input;
 
-interface AdditionalInfo {
-    // for check box
-    default?: boolean | string;
-    // for selections
-    selections?: string[];
-    // for object
-    children?: AdditionalInfo[];
 
-    // common
-    type: AdditionalInfoType;
-    name: string;
-    property?: string;
-    required: boolean;
-}
-
-enum AdditionalInfoType {
-    Input = 'Input',
-    Selection = 'Selection',
-    CheckBox = 'CheckBox',
-    TextArea = 'TextArea',
-    List = 'List'
-}
 
 const getBasicInfo = () => {
     return [
         {
             name: 'Label',
             required: true,
-            type: AdditionalInfoType.Input,
+            type: AttributeType.Input,
 
         },
         {
             name: 'Description',
             required: false,
-            type: AdditionalInfoType.Input,
+            type: AttributeType.Input,
 
         },
         {
             name: 'Redirect',
             required: false,
-            type: AdditionalInfoType.Input,
+            type: AttributeType.Input,
 
         },
         {
             name: 'Reposiotry',
             required: false,
-            type: AdditionalInfoType.Input,
+            type: AttributeType.Input,
 
         },
-    ] as AdditionalInfo[]
-}
-
-const getAdditionalInfo = (type: NodeType) => {
-    switch (type) {
-        case NodeType.Flink:
-            return [
-                {
-                    name: 'Cluster',
-                    required: true,
-                    type: AdditionalInfoType.Selection,
-                    selections: ['ClusterA', 'ClusterB'],
-                    default: 'ClusterA'
-                },
-                {
-                    name: 'Venv',
-                    required: true,
-                    type: AdditionalInfoType.CheckBox,
-                    default: true
-                }] as AdditionalInfo[]
-        case NodeType.Redhat:
-            return [{
-                name: 'Machine',
-                required: true,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'Actuator',
-                required: false,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'Autosys',
-                required: false,
-                type: AdditionalInfoType.TextArea
-            },
-            ] as AdditionalInfo[];
-        case NodeType.StoreProcedure:
-            return [{
-                name: 'Persistence',
-                required: true,
-                type: AdditionalInfoType.CheckBox
-            },
-            {
-                name: 'SP',
-                required: false,
-                type: AdditionalInfoType.TextArea
-            }] as AdditionalInfo[];
-        case NodeType.Kafka:
-            return [{
-                name: 'Region',
-                required: true,
-                selections: ['NY', 'MW'],
-                default: 'NY',
-                type: AdditionalInfoType.Selection
-            },
-            {
-                name: 'MessageType',
-                property: 'messageType',
-                required: true,
-                selections: ['AVRO', 'STRING'],
-                default: 'AVRO',
-                type: AdditionalInfoType.Selection
-            },
-            {
-                name: 'Jar',
-                required: false,
-                type: AdditionalInfoType.Input
-            }] as AdditionalInfo[];
-        case NodeType.HBase:
-            return [{
-                name: 'Namespace',
-                required: true,
-                type: AdditionalInfoType.Input
-            },
-            {
-                name: 'MessageType',
-                property: 'messageType',
-                required: true,
-                selections: ['AVRO', 'STRING', 'JSON'],
-                type: AdditionalInfoType.Selection,
-                default: 'AVRO'
-            }] as AdditionalInfo[];
-        case NodeType.S3:
-            return [{
-                name: 'Bucket',
-                required: true,
-                type: AdditionalInfoType.Input
-            }] as AdditionalInfo[];
-        case NodeType.ElasticSearch:
-            return [{
-                name: 'Date Keys',
-                property: 'dateKeys',
-                required: true,
-                type: AdditionalInfoType.List,
-                children: [{
-                    name: 'Key',
-                    required: true,
-                    type: AdditionalInfoType.Input
-                },
-                {
-                    name: 'isTimestamp',
-                    property: 'isTimestamp',
-                    required: true,
-                    type: AdditionalInfoType.CheckBox,
-                }] as AdditionalInfo[]
-            }] as AdditionalInfo[]
-        default:
-            return [] as AdditionalInfo[];
-    }
+    ] as AttributeInfo[]
 }
 
 interface NodeModalProps {
@@ -178,13 +49,19 @@ interface NodeModalProps {
     handleOk: (data: GnomonNode) => void,
     toggleVisible: VoidFunction
 }
-
-const AdditionalInfoList = (name: string, label: string, infos: AdditionalInfo[]) => (
-    <Form.List name={`${name}`}>
+/*
+-- Root
+    property:
+        0:
+            - field 1
+            - field 2
+ */
+const AdditionalInfoList = (name: string, label: string, infos: AttributeInfo[]) => (
+    <Form.List key={name} name={`${name}`}>
         {(fields, { add, remove }) => (
             <>
                 {fields.map((field) => (
-                    <Space key={field.key} align="baseline">
+                    <Space key={name} align="baseline">
                         {infos.map(info => {
                             const fieldName = info.property ? info.property : info.name.toLowerCase();
                             const props = {
@@ -195,14 +72,14 @@ const AdditionalInfoList = (name: string, label: string, infos: AdditionalInfo[]
                             };
 
 
-                            if (info.type === AdditionalInfoType.Input) {
+                            if (info.type === AttributeType.Input) {
                                 return <>
                                     <Form.Item {...props}>
                                         <Input placeholder={`input ${info.name}`} />
                                     </Form.Item>
                                 </>
                             }
-                            else if (info.type === AdditionalInfoType.Selection && info.selections) {
+                            else if (info.type === AttributeType.Selection && info.selections) {
                                 return <>
                                     <Form.Item {...props}>
                                         <Select>
@@ -211,14 +88,17 @@ const AdditionalInfoList = (name: string, label: string, infos: AdditionalInfo[]
                                     </Form.Item>
                                 </>
                             }
-                            else if (info.type === AdditionalInfoType.CheckBox) {
+                            else if (info.type === AttributeType.CheckBox) {
                                 return <>
                                     <Form.Item {...props} valuePropName="checked">
                                         <Checkbox defaultChecked={true} />
                                     </Form.Item>
                                 </>
                             }
-                            return <></>
+                            return <>
+                                <Form.Item {...props} noStyle>
+                                </Form.Item>
+                            </>
                         })}
                         <MinusCircleOutlined style={{ margin: '8px 0 0 0' }} onClick={() => remove(field.name)} />
                     </Space>
@@ -234,8 +114,8 @@ const AdditionalInfoList = (name: string, label: string, infos: AdditionalInfo[]
     </Form.List>
 )
 
-const getInitValues = (type: NodeType) => {
-    const infos = getBasicInfo().concat(getAdditionalInfo(type)).filter(f => !!f.default);
+const getInitValues = (type: string) => {
+    const infos = getBasicInfo().concat(utils.getNodeMetaDataByType(type)).filter(f => !!f.default);
     let obj = {}
     infos.forEach(info => {
         const fieldName = info.property ? info.property : info.name.toLowerCase();
@@ -246,11 +126,11 @@ const getInitValues = (type: NodeType) => {
     return obj;
 }
 
-export const getFields = (type: NodeType) => {
-    return getBasicInfo().concat(getAdditionalInfo(type)).map(info => info.property ? info.property : info.name.toLowerCase());
+export const getFields = (type: string) => {
+    return getBasicInfo().concat(utils.getNodeMetaDataByType(type)).map(info => info.property ? info.property : info.name.toLowerCase());
 }
 
-export const getDiff = (previous: NodeType, next: NodeType) => {
+export const getDiff = (previous: string, next: string) => {
     const after = getFields(next);
     let obj = {};
     getFields(previous).filter(x => after.indexOf(x) < 0).forEach(f => {
@@ -262,7 +142,7 @@ export const getDiff = (previous: NodeType, next: NodeType) => {
 }
 
 export const checkRequired = (data: NodeData) => {
-    const properties = getBasicInfo().concat(getAdditionalInfo(data.nodeType)).filter(f => f.required).map(info => info.property ? info.property : info.name.toLowerCase());
+    const properties = getBasicInfo().concat(utils.getNodeMetaDataByType(data.nodeType)).filter(f => f.required).map(info => info.property ? info.property : info.name.toLowerCase());
     return !!!properties.find(pro => !!!(data as any)[pro])
 }
 
@@ -354,7 +234,7 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
             autoComplete="off"
             initialValues={getInitValues(nodeType)}
             form={form}>
-            {getBasicInfo().concat(getAdditionalInfo(nodeType)).map(info => {
+            {getBasicInfo().concat(utils.getNodeMetaDataByType(nodeType)).map(info => {
                 const fieldName = info.property ? info.property : info.name.toLowerCase();
                 const props = {
                     key: `${node.id}-${fieldName}`,
@@ -363,14 +243,14 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
                     rules: [{ required: info.required, message: `Please input your ${info.name}` }]
                 };
 
-                if (info.type === AdditionalInfoType.Input) {
+                if (info.type === AttributeType.Input) {
                     return <>
                         <Form.Item {...props} >
                             <Input placeholder={`input ${info.name}`} />
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.Selection && info.selections) {
+                else if (info.type === AttributeType.Selection && info.selections) {
                     return <>
                         <Form.Item {...props} >
                             <Select>
@@ -379,21 +259,21 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.CheckBox) {
+                else if (info.type === AttributeType.CheckBox) {
                     return <>
                         <Form.Item {...props} valuePropName="checked">
                             <Checkbox defaultChecked={true} />
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.TextArea) {
+                else if (info.type === AttributeType.TextArea) {
                     return <>
                         <Form.Item {...props}>
                             <TextArea rows={4} />
                         </Form.Item>
                     </>
                 }
-                else if (info.type === AdditionalInfoType.List && info.children) {
+                else if (info.type === AttributeType.ListObject && info.children) {
                     return <>
                         {AdditionalInfoList(info.name, info.name, info.children)}
                     </>

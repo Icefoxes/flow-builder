@@ -34,10 +34,11 @@ flowRoute.post('/', (req: Request, res: Response) => {
 
 flowRoute.patch('/', (req: Request, res: Response) => {
     const flow = req.body as Flow;
+    const body = Object.assign({}, flow)
     if (flow) {
         flowApi.updateFlow(flow).then(rlt => {
             if (rlt.acknowledged) {
-                res.json(flow);
+                res.json(body);
             } else {
                 res.status(500);
             }

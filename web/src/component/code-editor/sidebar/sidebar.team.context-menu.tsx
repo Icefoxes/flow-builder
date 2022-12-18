@@ -13,7 +13,9 @@ export enum TeamContextMenuType {
     EditTeam = "EditTeam",
     DeleteTeam = "DeleteTeam",
 
-    AddFlow = "AddFlow"
+    AddFlow = "AddFlow",
+
+    EditMeta = "EditMeta"
 }
 
 interface TeamContextMenuProps {
@@ -57,6 +59,15 @@ export const TeamContextMenu: FC<TeamContextMenuProps> = ({ onItemClick }) => {
                 }}
                 onClick={({ props }) => onItemClick(TeamContextMenuType.AddFlow, props)}>
                 Add Flow
+            </Item>
+
+            <Item key={'edit-meta'}
+                hidden={({ props }) => {
+                    const { source } = props;
+                    return 'workspace' !== source;
+                }}
+                onClick={() => onItemClick(TeamContextMenuType.EditMeta)}>
+                Edit Meta
             </Item>
         </Menu>
     </>

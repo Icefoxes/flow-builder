@@ -25,12 +25,12 @@ import { NodeConfig, UserDefinedNode } from "./node";
 import { NodeContextMenuType, ChangeNodeProps, NODE_MENU_ID, NodeContextMenu } from './node/node.context-menu';
 import { UserDefinedEdge } from "./edge";
 import { DeleteEdgeProps, EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
-import { Flow, GnomonNode, NodeType } from "../../model";
+import { Flow, GnomonNode } from "../../model";
 
 import Utils from '../shared/util';
 import { ControlType, DiagramToolBarComponent } from "./toolbar/diagram.toolbar";
 import { setActiveFlow } from '../../feature/admin/adminSlice';
-import { getDiff, getFields, NodeModalComponent } from "./node/node.modal";
+import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
 import { getDagreLayoutedElements } from "./dagre";
@@ -52,7 +52,7 @@ const newNode = (nodes: Node<any>[], id: string) => {
         id: id,
         data: {
             label: 'New node',
-            nodeType: NodeType.Kafka
+            nodeType: 'Kafka'
         },
         position: {
             x: x_max + NodeConfig.Width + NodeConfig.NodeSpace,
@@ -212,13 +212,15 @@ export const DiagramComponent: FC<{
         else if (control === NodeContextMenuType.Copy) {
             const node = props as GnomonNode;
             makeUndoSnapshot();
-            setNodes([...nodes, Object.assign({}, node, {
+            setNodes([...nodes, {
                 id: Utils.newUUID(),
                 position: {
                     x: node.position.x,
                     y: node.position.y + 100,
-                }
-            })]);
+                },
+                data: node.data,
+                type: node.type
+            } as Node<any>]);
         }
     }
 

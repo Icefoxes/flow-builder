@@ -6,7 +6,7 @@ import { FcFolder, FcBriefcase, FcBarChart } from 'react-icons/fc';
 import {
     ExclamationCircleOutlined,
 } from '@ant-design/icons';
-
+import { useNavigate } from "react-router-dom";
 import './sidebar.component.scss';
 
 import { FlowContextMenu, FlowContextMenuType, FLOW_SIDEBAR_MENU } from "./sidebar.flow.context-menu";
@@ -34,6 +34,7 @@ interface EditorSidebarModalState {
 }
 
 export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, activeFlow }) => {
+    const navigate = useNavigate();
     // serivce
     const [createTeam] = useCreateTeamMutation();
     const [updateTeam] = useUpdateTeamMutation();
@@ -140,6 +141,9 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 activeTeam: team,
                 teamCreateModalVisible: true
             });
+        }
+        else if (item === TeamContextMenuType.EditMeta) {
+            navigate('/meta');
         }
     }
 

@@ -1,6 +1,7 @@
 import * as monacoTypes from "monaco-editor/esm/vs/editor/editor.api";
 import { EditorWillMount } from "react-monaco-editor";
-import { NodeType } from "../../model";
+import utils from "../shared/util";
+
 
 
 const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
@@ -49,7 +50,7 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                                     properties: {
                                         nodeType: {
                                             description: "the id of the node",
-                                            enum: Object.values(NodeType)
+                                            type: "string"
                                         },
                                         label: {
                                             description: "the label of the node",
@@ -142,7 +143,7 @@ export const onMonacoWillMount: EditorWillMount = (monacoParams) => {
                 endColumn: position.column
             };
             return {
-                suggestions: Object.values(NodeType).filter(word => word.startsWith(activeTyping))
+                suggestions: utils.getNodeMetaData().filter(word => word.startsWith(activeTyping))
                     .map(word => {
                         return {
                             label: word,
