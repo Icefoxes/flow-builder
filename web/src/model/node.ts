@@ -1,13 +1,20 @@
+export interface Extension {
+    component: string;
+    props: object;
+}
+
 export interface Flow {
     id: string;
     name: string;
+    alias: string;
     team: string;
-
     doc?: string;
     tag?: string;
 
     nodes: GnomonNode[];
     edges: GnomonEdge[];
+    
+    extension: Extension[];
 }
 
 export interface XYPosition {

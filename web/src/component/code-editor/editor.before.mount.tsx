@@ -21,6 +21,10 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                         description: "the name for a flow",
                         type: "string"
                     },
+                    alias: {
+                        description: "A unique identifier of the flow",
+                        type: "string",
+                    },
                     team: {
                         description: "the team of the flow",
                         type: "string"
@@ -78,7 +82,7 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                                     }
                                 },
                                 type: {
-                                    description: "the type of ",
+                                    description: "the type of node",
                                     type: "string",
                                     default: 'gnomon'
                                 }
@@ -89,11 +93,11 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                         description: "the edges of a flow",
                         type: "array",
                         items: {
-                            description: "List of indoor hobbies",
+                            description: "List of edges",
                             type: "object",
                             properties: {
                                 id: {
-                                    description: "the id of the node",
+                                    description: "the id of the edge",
                                     type: "string"
                                 },
                                 source: {
@@ -111,13 +115,31 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                                     type: "string",
                                 },
                                 type: {
-                                    description: "the type of ",
+                                    description: "the type of edge",
                                     type: "string",
                                     default: 'gnomon'
                                 }
                             }
                         }
                     },
+                    extension: {
+                        description: "the extension of a flow",
+                        type: "array",
+                        items: {
+                            description: "extension", 
+                            type: "object",
+                            properties: {
+                                component: {
+                                    description: "the id of the edge",
+                                    type: "string"
+                                },
+                                props: {
+                                    description: "the source of edge",
+                                    type: "object",
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
