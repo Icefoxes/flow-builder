@@ -20,7 +20,7 @@ describe('Add/Delete Team', () => {
     cy.get('.ant-tree-treenode').last().rightclick();
     cy.contains('Add Flow').click();
     cy.get('.toolbar-container').find('.tab').should('exist');
-    cy.get('.view-lines').find('div').should('have.length', 8);
+    cy.get('.view-lines').find('div').should('have.length', 10);
 
     // delete flow 
     cy.get('.ant-tree-switcher').last().click()
