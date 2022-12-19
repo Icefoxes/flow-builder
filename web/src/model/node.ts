@@ -52,6 +52,7 @@ export interface GnomonEdge {
 export interface FlowLight {
     id: string;
     name: string;
+    alias: string;
     tag?: string;
     team: string;
 }
@@ -61,4 +62,5 @@ export interface SearchItem {
     flowName: string;
     nodeName: string;
     nodeType: string;
+    alias: string;
 }

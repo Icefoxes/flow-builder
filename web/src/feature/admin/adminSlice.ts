@@ -18,13 +18,14 @@ const initialState: AdminState = {
   nodeMeta: []
 }
 
-const transformToFlowLight = (payload: Flow) => {
+const transformToFlowLight = (payload: Flow): FlowLight => {
   return {
     id: payload.id,
     team: payload.team,
     name: payload.name,
-    tag: payload.tag
-  } as FlowLight
+    tag: payload.tag,
+    alias: payload.alias
+  }
 }
 
 export const adminSlice = createSlice({
@@ -47,7 +48,9 @@ export const adminSlice = createSlice({
     builder.addMatcher(flowApi.endpoints.getFlowById.matchFulfilled, (state, { payload }) => {
       state.activeFlow = payload
     });
-
+    builder.addMatcher(flowApi.endpoints.getFlowByAlias.matchFulfilled, (state, { payload }) => {
+      state.activeFlow = payload
+    });
     builder.addMatcher(flowApi.endpoints.updateFlow.matchFulfilled, (state, { payload }) => {
       state.activeFlow = payload;
       state.flows = [...state.flows.filter(f => f.id !== payload.id), transformToFlowLight(payload)];

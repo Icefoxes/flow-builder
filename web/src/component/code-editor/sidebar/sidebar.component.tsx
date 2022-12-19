@@ -173,12 +173,12 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 </div>,
                 key: `${team.id}`,
                 isLeaf: false,
-                children: [...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
+                children: [...[...flows.filter(flow => !!!flow.tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                     return {
                         title: () => <div className="gnomon-tree-node"
                             onDoubleClick={() => {
                                 if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                    getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
                                 }
                             }}
                             onContextMenu={e => {
@@ -200,12 +200,12 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                         </div>,
                         key: `${team.id}-${tag}`,
                         isLeaf: false,
-                        children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
+                        children: [...[...flows.filter(flow => flow.tag === tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                             return {
                                 title: () => <div className="gnomon-tree-node"
                                     onDoubleClick={() => {
                                         if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                        getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                            getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
                                         }
                                     }}
                                     onContextMenu={e => {

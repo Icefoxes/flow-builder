@@ -5,9 +5,16 @@ import { Flow } from '../model';
 const flowRoute = express.Router();
 
 flowRoute.get('/', (req: Request, res: Response) => {
-    flowApi.findAll().then(rlt => {
-        res.json(rlt);
-    })
+    const alias = req.query.alias as string;
+    if (alias) {
+        flowApi.findFlowByAlias(alias).then(rlt => {
+            res.json(rlt);
+        })
+    } else {
+        flowApi.findAll().then(rlt => {
+            res.json(rlt);
+        })
+    }
 });
 
 flowRoute.get('/:id', (req: Request, res: Response) => {
@@ -37,7 +44,7 @@ flowRoute.patch('/', (req: Request, res: Response) => {
     const body = Object.assign({}, flow)
     if (flow) {
         flowApi.updateFlow(flow).then(rlt => {
-            if (rlt.acknowledged) {
+            if (rlt.ok) {
                 res.json(body);
             } else {
                 res.status(500);
@@ -59,7 +66,7 @@ flowRoute.delete('/', (req: Request, res: Response) => {
     } else {
         return res.status(500);
     }
-  
+
 });
 
 export { flowRoute };

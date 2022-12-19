@@ -145,7 +145,7 @@ export const getDiff = (previous: string, next: string) => {
 
 export const checkRequired = (data: NodeData) => {
     const properties = getBasicInfo().concat(utils.getNodeMetaDataByType(data.nodeType)).filter(f => f.required).map(info => info.property ? info.property : info.name.toLowerCase());
-    return !!!properties.find(pro => !!!(data as any)[pro])
+    return !!!properties.find(pro => !(pro in data));
 }
 
 export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisible, handleOk, node }) => {

@@ -34,6 +34,7 @@ import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
 import { getDagreLayoutedElements } from "./dagre";
+import { useUpdateFlowMutation } from "../../service";
 
 
 
@@ -71,8 +72,8 @@ const UNDO_CAPICITY = 3;
 
 export const DiagramComponent: FC<{
     flow: Flow,
-    onSave: (flow: Flow) => void,
-}> = ({ flow, onSave }) => {
+}> = ({ flow }) => {
+    const [updateFlow] = useUpdateFlowMutation();
     const [messageApi, contextHolder] = message.useMessage();
     // hooks
     const dispatch = useDispatch();
@@ -132,7 +133,7 @@ export const DiagramComponent: FC<{
         if (control === ControlType.Save) {
             setRedoSnapshot([]);
             setUndoSnapshot([]);
-            onSave(updatedFlow);
+            updateFlow({ flow: updatedFlow });
             messageApi.success('Saved Flow')
         } else if (control === ControlType.Edit) {
             setRedoSnapshot([]);
@@ -271,6 +272,7 @@ export const DiagramComponent: FC<{
         onDagreLayout('TB');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
 
     const onDagreLayout = (direction: string) => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(

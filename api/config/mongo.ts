@@ -27,15 +27,15 @@ export const flowApi = {
     findFlowById: (id: string) => {
         return flows.findOne({ id });
     },
-    findFlowByName: (teamId: string, name: string) => {
-        return flows.findOne({ 'team': teamId, name });
+    findFlowByAlias: (alias: string) => {
+        return flows.findOne({ alias });
     },
     findFlowByTeamId: (teamId: string) => {
         return flows.find({ 'team': teamId }).toArray();
     },
     updateFlow: (flow: Flow) => {
         delete (flow as any)['_id'];
-        return flows.updateOne({ 'id': flow.id }, { $set: { ...flow } });
+        return flows.findOneAndReplace({ 'id': flow.id }, flow);
     },
     deleteFlow: (flow: Flow) => {
         return flows.deleteOne({ id: flow.id });
@@ -48,6 +48,7 @@ export const flowApi = {
                 name: 1,
                 tag: 1,
                 team: 1,
+                alias: 1
             }
         }).toArray();
     },
@@ -56,7 +57,7 @@ export const flowApi = {
             { $match: { nodes: { $elemMatch: { 'data.label': { $regex: text } } } } },
             { $unwind: "$nodes" },
             { $match: { 'nodes.data.label': { $regex: text } } },
-            { $project: { flowId: '$id', flowName: '$name', nodeName: '$nodes.data.label', nodeType: '$nodes.data.nodeType', _id: 0 } },
+            { $project: { flowId: '$id', flowName: '$name', nodeName: '$nodes.data.label', nodeType: '$nodes.data.nodeType', alias: '$nodes.alias', _id: 0 } },
             { $limit: 5 }
         ]).toArray();
     }
@@ -71,7 +72,7 @@ export const teamApi = {
     },
     updateTeam: (team: Team) => {
         delete (team as any)['_id'];
-        return teams.updateOne({ id: team.id }, { $set: { ...team } });
+        return teams.findOneAndReplace({ id: team.id }, team);
     },
     deleteTeam: (team: Team) => {
         return teams.deleteOne({ id: team.id });
@@ -102,7 +103,7 @@ export const metaApi = {
     updateMeta: (meta: WithId<NodeTypeMeta>) => {
         const id = new ObjectId(meta._id);
         delete (meta as any)['_id'];
-        return metas.updateOne({ _id: id }, { $set: { ...meta } });
+        return metas.findOneAndReplace({ _id: id }, meta);
     },
     deleteMeta: (meta: WithId<NodeTypeMeta>) => {
         return metas.deleteOne({ _id: new ObjectId(meta._id) });

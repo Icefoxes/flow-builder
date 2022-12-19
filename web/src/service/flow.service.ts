@@ -12,6 +12,9 @@ export const flowApi = createApi({
         getFlowById: builder.query<Flow, { id: string }>({
             query: ({ id }) => `/flows/${id}`
         }),
+        getFlowByAlias: builder.query<Flow, { alias: string }>({
+            query: ({ alias }) => `/flows?alias=${alias}`
+        }),
         createFlow: builder.mutation<Flow, { flow: Flow }>({
             query: ({ flow }) => {
                 return {
@@ -45,4 +48,4 @@ export const flowApi = createApi({
     }),
 })
 
-export const { useGetFlowsQuery, useLazySearchNodeQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;
+export const { useGetFlowsQuery, useGetFlowByAliasQuery, useLazySearchNodeQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;

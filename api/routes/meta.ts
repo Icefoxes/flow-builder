@@ -38,7 +38,7 @@ metaRoute.patch('/', (req: Request, res: Response) => {
     const body = Object.assign({}, meta)
     if (body) {
         metaApi.updateMeta(body).then(rlt => {
-            if (rlt.acknowledged) {
+            if (rlt.ok) {
                 res.json(meta);
             } else {
                 res.status(500);
