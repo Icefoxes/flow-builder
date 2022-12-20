@@ -14,4 +14,3 @@ docker-compose up
 
 ## Bug
 1. sidebar toggle, editor not adapt
-2. the diagram should be reversed 

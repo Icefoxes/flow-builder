@@ -1,18 +1,14 @@
 
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect } from "react";
 import { Form, Input, Select, Modal, Checkbox, Button, Space } from 'antd';
 import {
     MinusCircleOutlined,
     PlusOutlined
 } from '@ant-design/icons';
-import type { DraggableData, DraggableEvent } from 'react-draggable';
-import Draggable from 'react-draggable';
 import { AttributeInfo, AttributeType, GnomonNode, NodeData } from "../../../model";
 import utils from "../../shared/util";
 
 const { TextArea } = Input;
-
-
 
 const getBasicInfo = () => {
     return [
@@ -30,6 +26,12 @@ const getBasicInfo = () => {
         },
         {
             name: 'Redirect',
+            required: false,
+            type: AttributeType.Input,
+
+        },
+        {
+            name: 'Owner',
             required: false,
             type: AttributeType.Input,
 
@@ -126,7 +128,7 @@ const getInitValues = (type: string) => {
     return obj;
 }
 
-export const getFields = (type: string) => {
+const getFields = (type: string) => {
     return getBasicInfo().concat(utils.getNodeMetaDataByType(type)).map(info => info.property ? info.property : info.name.toLowerCase());
 }
 
@@ -143,64 +145,13 @@ export const getDiff = (previous: string, next: string) => {
 
 export const checkRequired = (data: NodeData) => {
     const properties = getBasicInfo().concat(utils.getNodeMetaDataByType(data.nodeType)).filter(f => f.required).map(info => info.property ? info.property : info.name.toLowerCase());
-    return !!!properties.find(pro => !!!(data as any)[pro])
+    return !!!properties.find(pro => !(pro in data));
 }
 
 export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisible, handleOk, node }) => {
     const nodeType = node.data.nodeType;
     // hooks
     const [form] = Form.useForm();
-    // state
-    const [disabled, setDisabled] = useState(false);
-    const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
-    // ref
-    const draggleRef = useRef<HTMLDivElement>(null)
-    // functions
-    const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
-        const { clientWidth, clientHeight } = window.document.documentElement;
-        const targetRect = draggleRef.current?.getBoundingClientRect();
-        if (!targetRect) {
-            return;
-        }
-        setBounds({
-            left: -targetRect.left + uiData.x,
-            right: clientWidth - (targetRect.right - uiData.x),
-            top: -targetRect.top + uiData.y,
-            bottom: clientHeight - (targetRect.bottom - uiData.y),
-        });
-    };
-
-    const modalTitle = (
-        <div
-            style={{
-                width: '100%',
-                height: '40px',
-                cursor: 'move',
-            }}
-            onMouseOver={() => {
-                if (disabled) {
-                    setDisabled(false);
-                }
-            }}
-            onMouseOut={() => {
-                setDisabled(true);
-            }}
-            onFocus={() => { }}
-            onBlur={() => { }} >
-            Node Info
-        </div>
-    );
-
-    const modalRender = (modal: React.ReactNode) => {
-        return <>
-            <Draggable
-                disabled={disabled}
-                bounds={bounds}
-                onStart={(event, uiData) => onStart(event, uiData)}>
-                <div ref={draggleRef}>{modal}</div>
-            </Draggable>
-        </>
-    }
 
     useEffect(() => {
         form.resetFields();
@@ -225,8 +176,7 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
     return <Modal
         forceRender
         keyboard
-        title={modalTitle}
-        modalRender={modalRender}
+        title='Node Info'
         open={isModalOpen}
         onOk={onOk}
         onCancel={toggleVisible}>

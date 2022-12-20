@@ -64,88 +64,99 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
     };
 
     const onFlowContextMenu = (item: FlowContextMenuType, props?: any) => {
-        if (item === FlowContextMenuType.Edit) {
-            const flow = props as FlowLight;
-            if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
-            }
-            return;
-        }
-        else if (item === FlowContextMenuType.Delete) {
-            const flow = props as FlowLight;
-            Modal.confirm({
-                title: 'Confirm',
-                icon: <ExclamationCircleOutlined />,
-                content: 'Do you want to delete this flow',
-                okText: 'Confirm',
-                cancelText: 'Cancel',
-                onOk: () => {
-                    deleteFlow({ flow });
-                    message.success(`deleted flow ${flow.name}`);
+        const flow = props as FlowLight;
+        switch (item) {
+            case FlowContextMenuType.Edit: {
+                if (!!!activeFlow || (activeFlow.id !== flow.id)) {
+                    getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
                 }
-            });
-        } else if (item === FlowContextMenuType.Copy) {
-            const flow = props as FlowLight;
-            getFlowById({ id: flow.id }).unwrap().then(data => {
-                let text = JSON.stringify(data);
-                data?.nodes.forEach(n => {
-                    const id = utils.newUUID();
-                    text = text.replaceAll(n.id, id);
+                break;
+            }
+            case FlowContextMenuType.Delete: {
+                Modal.confirm({
+                    title: 'Confirm',
+                    icon: <ExclamationCircleOutlined />,
+                    content: 'Do you want to delete this flow',
+                    okText: 'Confirm',
+                    cancelText: 'Cancel',
+                    onOk: () => {
+                        deleteFlow({ flow });
+                        message.success(`deleted flow ${flow.name}`);
+                    }
                 });
-                const copiedFlow = JSON.parse(text) as Flow;
-                createFlow({
-                    flow: Object.assign({}, copiedFlow, {
-                        _id: undefined,
-                        id: utils.newUUID(),
-                        name: 'TO_BE_REPLACED',
-                        tag: undefined
-                    })
-                });
-            })
+                break;
+            }
+            case FlowContextMenuType.Copy: {
+                getFlowById({ id: flow.id }).unwrap().then(data => {
+                    let text = JSON.stringify(data);
+                    data?.nodes.forEach(n => {
+                        const id = utils.newUUID();
+                        text = text.replaceAll(n.id, id);
+                    });
+                    const copiedFlow = JSON.parse(text) as Flow;
+                    createFlow({
+                        flow: Object.assign({}, copiedFlow, {
+                            _id: undefined,
+                            id: utils.newUUID(),
+                            name: 'TO_BE_REPLACED',
+                            tag: undefined
+                        })
+                    });
+                })
+                break;
+            }
         }
     }
 
     const onTeamContextMenu = (item: TeamContextMenuType, props?: any) => {
-        if (item === TeamContextMenuType.AddTeam) {
-            setModalState({
-                activeTeam: null,
-                teamCreateModalVisible: true
-            });
-        }
-        else if (item === TeamContextMenuType.AddFlow) {
-            const { id } = props;
-            createFlow({ flow: utils.newFlow(id) });
-        }
-        else if (item === TeamContextMenuType.DeleteTeam) {
-            const team = props as Team;
-            const flowsNotDeleted = flows.find(f => f.team === team.id);
-            if (flowsNotDeleted) {
-                message.error(`please delete all flows under ${team.name} first`);
-                return;
+        switch (item) {
+            case TeamContextMenuType.AddTeam: {
+                setModalState({
+                    activeTeam: null,
+                    teamCreateModalVisible: true
+                });
+                break;
             }
-            Modal.confirm({
-                title: 'Confirm',
-                icon: <ExclamationCircleOutlined />,
-                content: 'Do you want to delete this team',
-                okText: 'Confirm',
-                cancelText: 'Cancel',
-                onOk: () => {
-                    deleteTeam(team);
-                    message.success(`deleted team ${team.name}`);
+            case TeamContextMenuType.AddFlow: {
+                const { id } = props;
+                createFlow({ flow: utils.newFlow(id) });
+                break;
+            }
+            case TeamContextMenuType.DeleteTeam: {
+                const team = props as Team;
+                const flowsNotDeleted = flows.find(f => f.team === team.id);
+                if (flowsNotDeleted) {
+                    message.error(`please delete all flows under ${team.name} first`);
+                    return;
                 }
-            });
-        }
-        else if (item === TeamContextMenuType.EditTeam) {
-            const team = props as Team;
-            setModalState({
-                activeTeam: team,
-                teamCreateModalVisible: true
-            });
-        }
-        else if (item === TeamContextMenuType.EditMeta) {
-            navigate('/meta');
+                Modal.confirm({
+                    title: 'Confirm',
+                    icon: <ExclamationCircleOutlined />,
+                    content: 'Do you want to delete this team',
+                    okText: 'Confirm',
+                    cancelText: 'Cancel',
+                    onOk: () => {
+                        deleteTeam(team);
+                        message.success(`deleted team ${team.name}`);
+                    }
+                });
+                break;
+            }
+            case TeamContextMenuType.EditTeam: {
+                const team = props as Team;
+                setModalState({
+                    activeTeam: team,
+                    teamCreateModalVisible: true
+                });
+                break;
+            }
+            case TeamContextMenuType.EditMeta: {
+                navigate('/meta');
+                break;
+            }
         }
     }
+
 
     const onTeamCreateModal = (team: Team) => {
         if (team._id) {
@@ -173,12 +184,12 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 </div>,
                 key: `${team.id}`,
                 isLeaf: false,
-                children: [...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
+                children: [...[...flows.filter(flow => !!!flow.tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                     return {
                         title: () => <div className="gnomon-tree-node"
                             onDoubleClick={() => {
                                 if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                    getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
                                 }
                             }}
                             onContextMenu={e => {
@@ -200,12 +211,12 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                         </div>,
                         key: `${team.id}-${tag}`,
                         isLeaf: false,
-                        children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
+                        children: [...[...flows.filter(flow => flow.tag === tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                             return {
                                 title: () => <div className="gnomon-tree-node"
                                     onDoubleClick={() => {
                                         if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                        getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                            getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
                                         }
                                     }}
                                     onContextMenu={e => {

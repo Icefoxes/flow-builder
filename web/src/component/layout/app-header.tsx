@@ -29,7 +29,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
     const searchResult = (q: string, items: SearchItem[]) =>
         items.map((item) => {
             return {
-                value: item.flowId,
+                value: item.alias,
                 label: (
                     <div
                         style={{

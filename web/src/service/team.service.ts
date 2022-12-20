@@ -5,7 +5,7 @@ export const teamApi = createApi({
     reducerPath: 'teamApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
     endpoints: (builder) => ({
-        getTeams: builder.query<Team[], {}>({
+        getTeams: builder.query<Team[], void>({
             query: () => `/teams`
         }),
         createTeam: builder.mutation<Team, Team>({

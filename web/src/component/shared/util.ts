@@ -75,9 +75,11 @@ const newFlow = (id: string) => {
     return {
         id: newUUID(),
         team: id,
+        alias: id,
         name: 'TO_BE_REPLACED',
         nodes: [],
-        edges: []
+        edges: [],
+        extension: []
     } as Flow;
 }
 
@@ -89,7 +91,7 @@ const utils = {
     newFlow,
     getNodeMetaDataByType,
     getNodeMetaData,
-    
+
 }
 
 export default utils;

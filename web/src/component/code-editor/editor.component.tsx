@@ -125,29 +125,34 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
     }
 
     const onToolbarClick = (nodeType: EditorToolbarControlType, props?: any) => {
-        if (nodeType === EditorToolbarControlType.Save) {
-            const value = editor?.getModel()?.getValue();
-            if (value) {
-                const flow = JSON.parse(value) as Flow;
-                if (flow.name) {
-                    onSaveFlow(flow);
-                    messageApi.success('Saved Flow');
+        switch (nodeType) {
+            case EditorToolbarControlType.Save: {
+                const value = editor?.getModel()?.getValue();
+                if (value) {
+                    const flow = JSON.parse(value) as Flow;
+                    if (flow.name) {
+                        onSaveFlow(flow);
+                        messageApi.success('Saved Flow');
+                    }
+                    else {
+                        messageApi.error('please select one Flow first');
+                    }
                 }
-                else {
-                    messageApi.error('please select one Flow first');
-                }
+                break;
             }
-        } else if (nodeType === EditorToolbarControlType.GoToDiagram) {
-            const value = editor?.getModel()?.getValue();
-            if (value) {
-                const flow = JSON.parse(value) as Flow;
-                if (flow.name) {
-                    setActiveFlow(flow);
-                    navigation('/diagram')
+            case EditorToolbarControlType.GoToDiagram: {
+                const value = editor?.getModel()?.getValue();
+                if (value) {
+                    const flow = JSON.parse(value) as Flow;
+                    if (flow.name) {
+                        setActiveFlow(flow);
+                        navigation('/diagram')
+                    }
+                    else {
+                        messageApi.error('please select one Flow first');
+                    }
                 }
-                else {
-                    messageApi.error('please select one Flow first');
-                }
+                break
             }
         }
     }

@@ -26,7 +26,13 @@ const { Sider } = Layout;
 
 const ICONS = [<AimOutlined />, <BuildOutlined />, <BorderlessTableOutlined />, <BankOutlined />, <DatabaseOutlined />, <DeploymentUnitOutlined />, <FieldTimeOutlined />, <GatewayOutlined />, <HddOutlined />, <GroupOutlined />]
 
-const RandomInt = (v: string) => {
+const RandomInt = (v: string): number => {
+    if (v.length === 0) {
+        return 0;
+    }
+    if (v.length < 3 && v.length > 0) {
+        return (v.charCodeAt(1)) % ICONS.length
+    }
     return (v.charCodeAt(3) + v.charCodeAt(4) + v.charCodeAt(5) + v.charCodeAt(6)) % ICONS.length
 }
 
@@ -59,7 +65,7 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                                     return {
                                         key: `${flow.id}`,
                                         label: flow.name,
-                                        icon: <Link to={`/flows/${flow.id}`}>{ICONS[RandomInt(flow.id)]}</Link>,
+                                        icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow.id)]}</Link>,
                                     }
                                 }),
                                 ...(tags || []).sort().map(tag => {
@@ -71,7 +77,7 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                                             return {
                                                 key: `${flow.id}`,
                                                 label: flow.name,
-                                                icon: <Link to={`/flows/${flow.id}`}>{ICONS[RandomInt(flow.id)]}</Link>,
+                                                icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow.id)]}</Link>,
                                             }
                                         })]
                                     }

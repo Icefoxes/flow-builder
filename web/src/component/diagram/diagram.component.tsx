@@ -34,6 +34,7 @@ import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
 import { getDagreLayoutedElements } from "./dagre";
+import { useUpdateFlowMutation } from "../../service";
 
 
 
@@ -71,8 +72,8 @@ const UNDO_CAPICITY = 3;
 
 export const DiagramComponent: FC<{
     flow: Flow,
-    onSave: (flow: Flow) => void,
-}> = ({ flow, onSave }) => {
+}> = ({ flow }) => {
+    const [updateFlow] = useUpdateFlowMutation();
     const [messageApi, contextHolder] = message.useMessage();
     // hooks
     const dispatch = useDispatch();
@@ -129,105 +130,121 @@ export const DiagramComponent: FC<{
 
     const onContorlButtonClick = (control: ControlType) => {
         const updatedFlow = Utils.transformFlowLight(nodes, edges, flow);
-        if (control === ControlType.Save) {
-            setRedoSnapshot([]);
-            setUndoSnapshot([]);
-            onSave(updatedFlow);
-            messageApi.success('Saved Flow')
-        } else if (control === ControlType.Edit) {
-            setRedoSnapshot([]);
-            setUndoSnapshot([]);
-            dispatch(setActiveFlow(updatedFlow));
-            navigate('/');
-        } else if (control === ControlType.Undo) {
-            const snap = undoSnapshot.pop();
-            if (snap) {
-                makeRedoSnapshot();
-                setNodes(snap.nodes);
-                setEdges(snap.edges);
+        switch (control) {
+            case ControlType.Save:
+                setRedoSnapshot([]);
+                setUndoSnapshot([]);
+                updateFlow({ flow: updatedFlow });
+                messageApi.success('Saved Flow')
+                break;
+            case ControlType.Edit:
+                setRedoSnapshot([]);
+                setUndoSnapshot([]);
+                dispatch(setActiveFlow(updatedFlow));
+                navigate('/');
+                break;
+            case ControlType.Undo: {
+                const snap = undoSnapshot.pop();
+                if (snap) {
+                    makeRedoSnapshot();
+                    setNodes(snap.nodes);
+                    setEdges(snap.edges);
+                }
+                break;
             }
-        } else if (control === ControlType.Redo) {
-            const snap = redoSnapshot.pop();
-            if (snap) {
-                setNodes(snap.nodes);
-                setEdges(snap.edges);
+            case ControlType.Redo: {
+                const snap = redoSnapshot.pop();
+                if (snap) {
+                    setNodes(snap.nodes);
+                    setEdges(snap.edges);
+                }
             }
         }
     }
 
     const onEdgeContextMenuClick = (control: EdgeContextMenuType, props: any) => {
-        if (control === EdgeContextMenuType.Delete) {
-            const deleteProps = props as DeleteEdgeProps;
-            makeUndoSnapshot();
-            setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
+        switch (control) {
+            case EdgeContextMenuType.Delete:
+                const deleteProps = props as DeleteEdgeProps;
+                makeUndoSnapshot();
+                setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
+                break;
         }
     }
 
     const onNodeContextMenuItemClick = (control: NodeContextMenuType, props: any) => {
-        if (control === NodeContextMenuType.Create) {
-            makeUndoSnapshot();
-            const current = props as GnomonNode;
-            setNodes([...nodes, Object.assign({}, newNode(nodes, Utils.newUUID()), {
-                position: {
-                    x: current.position.x,
-                    y: current.position.y + 100,
-                }
-            })]);
-        }
-        // change node type
-        else if (control === NodeContextMenuType.ChangeType) {
-            makeUndoSnapshot();
-            const data = props as ChangeNodeProps;
-            const found = nodes.find(node => node.id === data.id) as Node;
-            const diff = getDiff(found.data.nodeType, data.type);
-            setNodes([...nodes.filter(node => node.id !== data.id), Object.assign({}, found, {
-                data: Object.assign({}, found.data, {
-                    nodeType: data.type,
-                    ...diff
-                })
-            })]);
-        }
-        // delete node
-        else if (control === NodeContextMenuType.Delete) {
-            const data = props as GnomonNode;
-            Modal.confirm({
-                title: 'Confirm',
-                icon: <ExclamationCircleOutlined />,
-                content: 'Do you want to delete this node',
-                okText: 'Confirm',
-                cancelText: 'Cancel',
-                onOk: () => {
-                    makeUndoSnapshot();
-                    setNodes([...nodes.filter(node => node.id !== data.id)]);
-                    setEdges([...edges.filter(edge => edge.source !== data.id && edge.target !== data.id)]);
-                    message.success(`deleted ${data.data.label}`);
-                }
-            });
-        }
-        else if (control === NodeContextMenuType.Edit) {
-            const node = props as GnomonNode;
-            setEditNode(node);
-            setEditNodeVisible(true);
-        }
-        else if (control === NodeContextMenuType.Copy) {
-            const node = props as GnomonNode;
-            makeUndoSnapshot();
-            setNodes([...nodes, {
-                id: Utils.newUUID(),
-                position: {
-                    x: node.position.x,
-                    y: node.position.y + 100,
-                },
-                data: node.data,
-                type: node.type
-            } as Node<any>]);
+        switch (control) {
+            case NodeContextMenuType.Create: {
+                makeUndoSnapshot();
+                const current = props as GnomonNode;
+                setNodes([...nodes, Object.assign({}, newNode(nodes, Utils.newUUID()), {
+                    position: {
+                        x: current.position.x,
+                        y: current.position.y + 100,
+                    }
+                })]);
+                break;
+            }
+            case NodeContextMenuType.ChangeType: {
+                makeUndoSnapshot();
+                const data = props as ChangeNodeProps;
+                const found = nodes.find(node => node.id === data.id) as Node;
+                const diff = getDiff(found.data.nodeType, data.type);
+                setNodes([...nodes.filter(node => node.id !== data.id), Object.assign({}, found, {
+                    data: Object.assign({}, found.data, {
+                        nodeType: data.type,
+                        ...diff
+                    })
+                })]);
+                break;
+            }
+
+            case NodeContextMenuType.Delete: {
+                const data = props as GnomonNode;
+                Modal.confirm({
+                    title: 'Confirm',
+                    icon: <ExclamationCircleOutlined />,
+                    content: 'Do you want to delete this node',
+                    okText: 'Confirm',
+                    cancelText: 'Cancel',
+                    onOk: () => {
+                        makeUndoSnapshot();
+                        setNodes([...nodes.filter(node => node.id !== data.id)]);
+                        setEdges([...edges.filter(edge => edge.source !== data.id && edge.target !== data.id)]);
+                        message.success(`deleted ${data.data.label}`);
+                    }
+                });
+                break;
+            }
+            case NodeContextMenuType.Edit: {
+                const node = props as GnomonNode;
+                setEditNode(node);
+                setEditNodeVisible(true);
+                break;
+            }
+            case NodeContextMenuType.Copy: {
+                const node = props as GnomonNode;
+                makeUndoSnapshot();
+                setNodes([...nodes, {
+                    id: Utils.newUUID(),
+                    position: {
+                        x: node.position.x,
+                        y: node.position.y + 100,
+                    },
+                    data: node.data,
+                    type: node.type
+                } as Node<any>]);
+            }
         }
     }
 
     const onDiagramContextMenuClick = (item: DiagramContextMenuType) => {
-        if (item === DiagramContextMenuType.AddNode) {
-            makeUndoSnapshot();
-            setNodes([...nodes, newNode(nodes, Utils.newUUID())]);
+        switch (item) {
+            case DiagramContextMenuType.AddNode: {
+                makeUndoSnapshot();
+                setNodes([...nodes, newNode(nodes, Utils.newUUID())]);
+                break;
+            }
         }
     }
 
@@ -271,6 +288,7 @@ export const DiagramComponent: FC<{
         onDagreLayout('TB');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
 
     const onDagreLayout = (direction: string) => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
