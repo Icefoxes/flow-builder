@@ -15,7 +15,7 @@ describe('Add/Delete Team', () => {
     // antd has a hidden one
     // assert, new team has been created
     cy.get('.ant-tree-treenode').should('have.length', 3);
-    
+
 
     cy.get('.ant-tree-treenode').last().rightclick();
     cy.contains('Add Flow').click();
@@ -36,5 +36,26 @@ describe('Add/Delete Team', () => {
     // assert, new team has been deleted
     cy.get('.ant-tree-treenode').should('have.length', 2);
   });
+
+  it('Type', () => {
+    cy.wait(1000);
+    cy.get('.ant-tree-switcher').last().click()
+    cy.get('.ant-tree-switcher').last().click()
+    cy.get('.gnomon-tree-node').last().dblclick();
+
+    cy.get('.view-lines').find('div').should('have.length', 30);
+
+    cy.get('.anticon-apartment').click();
+    cy.url().should('include', 'diagram')
+
+    cy.get('.node-root').should('have.length', 5)
+    cy.get('.react-flow').rightclick('left');
+    cy.contains('Add Node').click();
+    cy.get('.node-root').should('have.length', 6)
+
+    cy.get('.node-root').last().rightclick();
+    cy.contains('Copy Node').click();
+    cy.get('.node-root').should('have.length', 7)
+  })
 
 })
