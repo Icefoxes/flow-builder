@@ -10,9 +10,9 @@ export const FLOW_SIDEBAR_MENU = "FLOW_SIDEBAR_MENU";
 
 
 export enum FlowContextMenuType {
-    Edit = "Edit",
-    Delete = 'Delete',
-    Copy = 'Copy'
+    EditFlow = "Edit",
+    DeleteFlow = 'Delete',
+    CopyFlow = 'Copy'
 }
 
 interface FlowContextMenuProps {
@@ -25,21 +25,21 @@ export const FlowContextMenu: FC<FlowContextMenuProps> = ({ onItemClick }) => {
         <Menu theme={'dark'} id={FLOW_SIDEBAR_MENU}>
             <Item onClick={({ props }) => {
                 const flow = props as Flow;
-                onItemClick(FlowContextMenuType.Edit, flow)
+                onItemClick(FlowContextMenuType.EditFlow, flow)
             }}>
                 Edit
             </Item>
 
             <Item onClick={({ props }) => {
                 const flow = props as Flow;
-                onItemClick(FlowContextMenuType.Copy, flow)
+                onItemClick(FlowContextMenuType.CopyFlow, flow)
             }}>
                 Copy
             </Item>
 
             <Item onClick={({ props }) => {
                 const flow = props as Flow;
-                onItemClick(FlowContextMenuType.Delete, flow)
+                onItemClick(FlowContextMenuType.DeleteFlow, flow)
             }}>
                 Delete
             </Item>

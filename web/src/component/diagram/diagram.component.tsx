@@ -81,7 +81,7 @@ export const DiagramComponent: FC<{
     const reactFlowInstance = useReactFlow();
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
-        flow.nodes,
+        flow.nodes.map(n => Object.assign({}, n, {type: 'gnomon'})),
         flow.edges
     );
 
@@ -134,7 +134,7 @@ export const DiagramComponent: FC<{
             case ControlType.Save:
                 setRedoSnapshot([]);
                 setUndoSnapshot([]);
-                updateFlow({ flow: updatedFlow });
+                updateFlow(updatedFlow);
                 messageApi.success('Saved Flow')
                 break;
             case ControlType.Edit:

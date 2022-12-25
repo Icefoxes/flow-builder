@@ -17,6 +17,7 @@ const NewNode: GnomonNode = {
 };
 
 const mockedMetas: NodeTypeMeta[] = [{
+    _id: '1',
     name: 'Kafka',
     icon: 0,
     functionalType: FunctionalTypeEnum.External,

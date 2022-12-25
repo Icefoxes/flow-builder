@@ -1,9 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 import { Team } from '../model';
+import { SharedBaseQuery } from './shared';
 
 export const teamApi = createApi({
     reducerPath: 'teamApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
+    baseQuery: SharedBaseQuery,
     endpoints: (builder) => ({
         getTeams: builder.query<Team[], void>({
             query: () => `/teams`
@@ -20,18 +21,17 @@ export const teamApi = createApi({
         updateTeam: builder.mutation<Team, Team>({
             query: (team) => {
                 return {
-                    url: `/teams`,
-                    method: 'PATCH',
+                    url: `/teams/${team._id}`,
+                    method: 'PUT',
                     body: team
                 }
             }
         }),
-        deleteTeam: builder.mutation<Team, Team>({
-            query: (team) => {
+        deleteTeam: builder.mutation<string, string>({
+            query: (teamId) => {
                 return {
-                    url: `/teams`,
-                    method: 'DELETE',
-                    body: team
+                    url: `/teams/${teamId}`,
+                    method: 'DELETE'
                 }
             }
         }),

@@ -55,29 +55,29 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                         label: 'Flow Builder',
                     },
                     ...teams.map(team => {
-                        const tags = Array.from(new Set(flows.filter(flow => flow.tag && flow.team === team.id).map(flow => flow.tag))) as string[];
+                        const tags = Array.from(new Set(flows.filter(flow => flow.tag && flow.teamId === team._id).map(flow => flow.tag))) as string[];
                         return {
-                            key: `${team.id}`,
-                            icon: ICONS[RandomInt(team.id)],
+                            key: `${team._id}`,
+                            icon: ICONS[RandomInt(team._id as string)],
                             label: team.name,
                             children: [
-                                ...flows.filter(flow => !!!flow.tag && flow.team === team.id).map(flow => {
+                                ...flows.filter(flow => !!!flow.tag && flow.teamId === team._id).map(flow => {
                                     return {
-                                        key: `${flow.id}`,
+                                        key: `${flow._id}`,
                                         label: flow.name,
-                                        icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow.id)]}</Link>,
+                                        icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow._id)]}</Link>,
                                     }
                                 }),
                                 ...(tags || []).sort().map(tag => {
                                     return {
-                                        key: `${team.id}-${tag}`,
+                                        key: `${team._id}-${tag}`,
                                         icon: ICONS[RandomInt(tag as string)],
                                         label: `${tag}`,
-                                        children: [...flows.filter(flow => flow.tag === tag && flow.team === team.id).map(flow => {
+                                        children: [...flows.filter(flow => flow.tag === tag && flow.teamId === team._id).map(flow => {
                                             return {
-                                                key: `${flow.id}`,
+                                                key: `${flow._id}`,
                                                 label: flow.name,
-                                                icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow.id)]}</Link>,
+                                                icon: <Link to={`/flows/${flow.alias}`}>{ICONS[RandomInt(flow._id)]}</Link>,
                                             }
                                         })]
                                     }
