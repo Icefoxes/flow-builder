@@ -5,8 +5,8 @@ import {
     UserOutlined,
     InfoCircleOutlined,
 } from '@ant-design/icons';
-import { useDebounceCallback } from '@react-hook/debounce';
 import './app-header.scss';
+import { debounce } from 'lodash';
 import { useLazySearchNodeQuery } from "../../service";
 import { SearchItem } from "../../model";
 
@@ -79,7 +79,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
                 options={options}
                 autoFocus
                 onSelect={onSelect}
-                onSearch={useDebounceCallback(handleSearch, 300)}
+                onSearch={debounce(handleSearch, 300)}
             >
                 <Input.Search size="large" placeholder="search node" enterButton />
             </AutoComplete>
