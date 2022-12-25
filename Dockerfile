@@ -18,7 +18,7 @@ RUN npm run build
 
 FROM node:16.19.0-alpine3.17 as final-remover
 WORKDIR /usr/app
-COPY --from=api-ts-compiler /usr/app/src/package*.json ./
+COPY --from=api-ts-compiler /usr/app/api/src/package*.json ./
 COPY --from=api-ts-compiler /usr/app/dist ./
 COPY --from=web-compiler /usr/app/build ./public
 RUN npm install --only=production
