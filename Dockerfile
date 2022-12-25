@@ -24,4 +24,4 @@ COPY --from=web-compiler /usr/app/build ./public
 RUN npm install --only=production
 EXPOSE 8080
 USER 1000
-CMD ["index.js"]
+CMD ["server.js"]
