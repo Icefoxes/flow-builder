@@ -15,8 +15,14 @@
             "type": "node",
             "request": "launch",
             "name": "API",
-            "program": "${workspaceFolder}/api/index.ts",
+            "program": "${workspaceFolder}/api/src/server.ts",
             "preLaunchTask": "tsc: build - api/tsconfig.json",
+            "console": "integratedTerminal",
+            "env": {
+                "NODE_ENV": "production",
+                "PORT": 8080,
+                "MONGODB_URL": "mongodb://localhost:27017"
+            },
             "outFiles": [
                 "${workspaceFolder}/api/dist/**/*.js"
             ]

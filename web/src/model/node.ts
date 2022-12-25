@@ -3,18 +3,32 @@ export interface Extension {
     props: object;
 }
 
-export interface Flow {
-    id: string;
+export interface FlowLight {
+    _id: string;
     name: string;
     alias: string;
-    team: string;
-    doc?: string;
     tag?: string;
+    teamId: string;
+}
 
+export interface FlowInfo {
+    name: string;
+    alias: string;
+    tag?: string;
+    teamId: string;
+    doc?: string;
     nodes: GnomonNode[];
     edges: GnomonEdge[];
-    
-    extension: Extension[];
+
+    extensions: Extension[];
+}
+
+export interface Flow extends FlowInfo {
+    _id: string;
+
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
 }
 
 export interface XYPosition {
@@ -49,17 +63,12 @@ export interface GnomonEdge {
     type: string;
 }
 
-export interface FlowLight {
-    id: string;
-    name: string;
-    alias: string;
-    tag?: string;
-    team: string;
-}
+
 
 export interface SearchItem {
     flowId: string;
     flowName: string;
+    nodeId: string;
     nodeName: string;
     nodeType: string;
     alias: string;

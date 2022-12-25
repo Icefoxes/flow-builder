@@ -122,7 +122,7 @@ const FlowSchema: monacoTypes.languages.json.DiagnosticsOptions = {
                             }
                         }
                     },
-                    extension: {
+                    extensions: {
                         description: "the extension of a flow",
                         type: "array",
                         items: {

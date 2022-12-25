@@ -11,7 +11,7 @@ export const ActiveDiagramContent: FC<{ flow: Flow, isLoading?: boolean }> = ({ 
     return <>
         <ReactFlowProvider>
             {(!isLoading && flow) && <>
-                <DiagramComponent key={flow.id} flow={flow} />
+                <DiagramComponent key={flow._id} flow={flow} />
             </>}
         </ReactFlowProvider>
     </>

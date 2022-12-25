@@ -1,11 +1,11 @@
-import { FC, useState } from "react"
-import { Layout } from "antd"
+import { FC, useEffect, useState } from "react"
+import { Layout, message } from "antd"
 import { Resizable } from "re-resizable";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CodeEditComponent, CodeEditProps, EditorSidebarComponent, TeamCreateModal, TEAM_SIDEBAR_MENU } from "../../component/code-editor"
 import { selectActiveFlow, selectFlows, selectTeams, setActiveFlow } from "./adminSlice";
-import { useCreateTeamMutation, useUpdateFlowMutation } from "../../service";
+import { useCreateFlowMutation, useCreateTeamMutation, useDeleteFlowMutation, useDeleteTeamMutation, useUpdateFlowMutation, useUpdateTeamMutation } from "../../service";
 import './editor.page.scss';
 import { useContextMenu } from "react-contexify";
 import { Team } from "../../model";
@@ -13,23 +13,44 @@ import { Team } from "../../model";
 const { Sider } = Layout;
 
 const EditorPage: FC = () => {
+    const [messageApi, contextHolder] = message.useMessage();
     const disptach = useDispatch();
+    // selectors
     const activeFlow = useSelector(selectActiveFlow);
     const teams = useSelector(selectTeams);
-
+    const flows = useSelector(selectFlows);
+    // state
     const [teamCreateModalVisible, setTeamCreateModalVisible] = useState<boolean>(false);
-    const [createTeam] = useCreateTeamMutation();
+    const [sidebarWidth, setSidebarWidth] = useState<number>(0);
+    // service
+    const [createTeam, { isLoading: CreateTeamisLoading, error: CreateTeamError }] = useCreateTeamMutation();
+    const [updateTeam, { isLoading: UpdateTeamisLoading, error: UpdateTeamError }] = useUpdateTeamMutation();
+    const [deleteTeam, { isLoading: DeleteTeamisLoading, error: DeleteTeamError }] = useDeleteTeamMutation();
+    const [createFlow, { isLoading: CreateFlowisLoading, error: CreateFlowError }] = useCreateFlowMutation();
+    const [updateFlow, { isLoading: UpdateFlowisLoading, error: UpdateFlowError }] = useUpdateFlowMutation();
+    const [deleteFlow, { isLoading: DeleteFlowisLoading, error: DeleteFlowError }] = useDeleteFlowMutation();
+
+    const isLoading = CreateTeamisLoading || UpdateTeamisLoading || DeleteTeamisLoading || CreateFlowisLoading || UpdateFlowisLoading || DeleteFlowisLoading;
+    const error = CreateTeamError || UpdateTeamError || DeleteTeamError || CreateFlowError || UpdateFlowError || DeleteFlowError;
+    // context menu
     const { show: showTeamContextMenu } = useContextMenu({
         id: TEAM_SIDEBAR_MENU
     });
+    // 
+    useEffect(() => {
+        if (error) {
+            messageApi.error((error as any)?.data?.message || 'unkonwn issue')
+        }
+    }, [messageApi, error]);
 
-    const flows = useSelector(selectFlows);
-    const [updateFlow, { isLoading }] = useUpdateFlowMutation();
-    const [sidebarWidth, setSidebarWidth] = useState<number>(0);
+
+    const { createdAt, updatedAt, __v, ...restProps } = activeFlow || {};
+
+
     const props: CodeEditProps = {
-        code: JSON.stringify(activeFlow || {}, undefined, 2),
+        code: JSON.stringify(restProps || {}, undefined, 2),
         onSaveFlow: (flow) => {
-            updateFlow({ flow });
+            updateFlow(flow);
         },
         sidebarWidth,
         isLoading,
@@ -41,6 +62,7 @@ const EditorPage: FC = () => {
         createTeam(team);
         setTeamCreateModalVisible(false);
     }
+
     return <Layout className="edit-page-root">
         <Resizable
             defaultSize={{
@@ -65,7 +87,15 @@ const EditorPage: FC = () => {
                 });
                 e.stopPropagation();
             }}>
-                {(teams && flows) && <EditorSidebarComponent teams={teams} flows={flows} activeFlow={activeFlow} />}
+                {(teams && flows) && <EditorSidebarComponent
+                    createTeam={createTeam}
+                    updateTeam={updateTeam}
+                    deleteTeam={deleteTeam}
+                    createFlow={createFlow}
+                    deleteFlow={deleteFlow}
+                    teams={teams}
+                    flows={flows}
+                    activeFlow={activeFlow} />}
 
             </Sider>
         </Resizable>
@@ -75,9 +105,15 @@ const EditorPage: FC = () => {
             <CodeEditComponent {...props} />
         </Layout>
 
-        <TeamCreateModal activeTeam={null} isModalOpen={teamCreateModalVisible} handleOk={onTeamCreateModal} toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
+        <TeamCreateModal
+            activeTeam={null}
+            isModalOpen={teamCreateModalVisible}
+            handleOk={onTeamCreateModal}
+            toggleVisible={() => setTeamCreateModalVisible(!teamCreateModalVisible)} />
+
         <div className="status-bar">
         </div>
+        {contextHolder}
     </Layout>
 }
 

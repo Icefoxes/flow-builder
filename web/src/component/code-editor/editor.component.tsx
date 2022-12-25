@@ -141,6 +141,12 @@ export const CodeEditComponent: FC<CodeEditProps> = ({ code, onSaveFlow, isLoadi
                 break;
             }
             case EditorToolbarControlType.GoToDiagram: {
+                const meta = localStorage.getItem('META');
+                if (!meta || (JSON.parse(meta) as []).length === 0) {
+                    messageApi.error('please edit meta first');
+                    break
+                }
+
                 const value = editor?.getModel()?.getValue();
                 if (value) {
                     const flow = JSON.parse(value) as Flow;

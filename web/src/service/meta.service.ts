@@ -1,19 +1,20 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { NodeTypeMeta } from '../model';
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { NodeTypeMeta, NodeTypeMetaInfo } from '../model';
+import { SharedBaseQuery } from './shared';
 
 // Define a service using a base URL and expected endpoints
 export const metaApi = createApi({
     reducerPath: 'metaApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
+    baseQuery: SharedBaseQuery,
     endpoints: (builder) => ({
         getMeta: builder.query<NodeTypeMeta[], void>({
             query: () => `/metas`
         }),
-        getMetaById: builder.query<NodeTypeMeta, { id: string }>({
-            query: ({ id }) => `/metas/${id}`
+        getMetaById: builder.query<NodeTypeMeta, string>({
+            query: (metaId) => `/metas/${metaId}`
         }),
-        createMeta: builder.mutation<NodeTypeMeta, { meta: NodeTypeMeta }>({
-            query: ({ meta }) => {
+        createMeta: builder.mutation<NodeTypeMeta, NodeTypeMetaInfo>({
+            query: (meta) => {
                 return {
                     url: `/metas`,
                     method: 'POST',
@@ -21,21 +22,20 @@ export const metaApi = createApi({
                 }
             }
         }),
-        updateMeta: builder.mutation<NodeTypeMeta, { meta: NodeTypeMeta }>({
-            query: ({ meta }) => {
+        updateMeta: builder.mutation<NodeTypeMeta, NodeTypeMeta>({
+            query: (meta) => {
                 return {
-                    url: `/metas`,
-                    method: 'PATCH',
+                    url: `/metas/${meta._id}`,
+                    method: 'PUT',
                     body: meta
                 }
             }
         }),
-        deleteMeta: builder.mutation<NodeTypeMeta, { meta: NodeTypeMeta }>({
-            query: ({ meta }) => {
+        deleteMeta: builder.mutation<string, string>({
+            query: (metaId) => {
                 return {
-                    url: `/metas`,
-                    method: 'DELETE',
-                    body: meta
+                    url: `/metas/${metaId}`,
+                    method: 'DELETE'
                 }
             }
         }),

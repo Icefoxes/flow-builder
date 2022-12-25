@@ -20,8 +20,8 @@ const initialState: AdminState = {
 
 const transformToFlowLight = (payload: Flow): FlowLight => {
   return {
-    id: payload.id,
-    team: payload.team,
+    _id: payload._id,
+    teamId: payload.teamId,
     name: payload.name,
     tag: payload.tag,
     alias: payload.alias
@@ -53,12 +53,12 @@ export const adminSlice = createSlice({
     });
     builder.addMatcher(flowApi.endpoints.updateFlow.matchFulfilled, (state, { payload }) => {
       state.activeFlow = payload;
-      state.flows = [...state.flows.filter(f => f.id !== payload.id), transformToFlowLight(payload)];
+      state.flows = [...state.flows.filter(f => f._id !== payload._id), transformToFlowLight(payload)];
     });
 
     builder.addMatcher(flowApi.endpoints.deleteFlow.matchFulfilled, (state, { payload }) => {
       state.activeFlow = null;
-      state.flows = [...state.flows.filter(flow => flow.id !== payload.id)];
+      state.flows = [...state.flows.filter(flow => flow._id !== payload)];
     });
 
     // team api
@@ -69,10 +69,10 @@ export const adminSlice = createSlice({
       state.teams = [...state.teams, payload];
     });
     builder.addMatcher(teamApi.endpoints.updateTeam.matchFulfilled, (state, { payload }) => {
-      state.teams = [...state.teams.filter(team => team.id !== payload.id), payload];
+      state.teams = [...state.teams.filter(team => team._id !== payload._id), payload];
     });
     builder.addMatcher(teamApi.endpoints.deleteTeam.matchFulfilled, (state, { payload }) => {
-      state.teams = [...state.teams.filter(t => t.id !== payload.id)];
+      state.teams = [...state.teams.filter(t => t._id !== payload)];
     });
 
     // meta api
@@ -90,7 +90,7 @@ export const adminSlice = createSlice({
       localStorage.setItem('META', JSON.stringify(state.nodeMeta));
     });
     builder.addMatcher(metaApi.endpoints.deleteMeta.matchFulfilled, (state, { payload }) => {
-      state.nodeMeta = [...state.nodeMeta.filter(t => t._id !== payload._id)];
+      state.nodeMeta = [...state.nodeMeta.filter(t => t._id !== payload)];
       localStorage.setItem('META', JSON.stringify(state.nodeMeta));
     });
   },

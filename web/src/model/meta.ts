@@ -1,9 +1,12 @@
-export interface NodeTypeMeta {
-    _id?: string;
+export interface NodeTypeMetaInfo {
     name: string;
     icon: number;
     functionalType: FunctionalTypeEnum
     attributes: AttributeInfo[];
+}
+
+export interface NodeTypeMeta extends NodeTypeMetaInfo {
+    _id: string;
 }
 
 export enum AttributeType {

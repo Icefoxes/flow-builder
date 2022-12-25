@@ -1,3 +1,14 @@
+.meta-action-bar {
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+.meta-add-icon {
+    margin: 1em 0;
+}
+
 .meta-attribute-container {
     padding: 20px 0;
     .logo {
@@ -10,14 +21,14 @@
         display: flex;
         align-items: center;
 
-        .ant-form-item  {
+        .ant-form-item {
             margin: 5px 10px;
         }
 
         .dynamic-delete-button {
             margin: 0 0 0 5px;
         }
-        
+
         .AddField {
             margin: 10px 0 0 0;
         }

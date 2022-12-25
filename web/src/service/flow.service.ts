@@ -1,10 +1,11 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Flow, FlowLight, SearchItem } from '../model';
+import { createApi, } from '@reduxjs/toolkit/query/react'
+import { Flow, FlowInfo, FlowLight, SearchItem } from '../model';
+import { SharedBaseQuery } from './shared';
 
 // Define a service using a base URL and expected endpoints
 export const flowApi = createApi({
     reducerPath: 'flowApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/api/v1' }),
+    baseQuery: SharedBaseQuery,
     endpoints: (builder) => ({
         getFlows: builder.query<FlowLight[], void>({
             query: () => `/flows`
@@ -15,8 +16,8 @@ export const flowApi = createApi({
         getFlowByAlias: builder.query<Flow, { alias: string }>({
             query: ({ alias }) => `/flows?alias=${alias}`
         }),
-        createFlow: builder.mutation<Flow, { flow: Flow }>({
-            query: ({ flow }) => {
+        createFlow: builder.mutation<Flow, FlowInfo>({
+            query: (flow) => {
                 return {
                     url: `/flows`,
                     method: 'POST',
@@ -24,21 +25,20 @@ export const flowApi = createApi({
                 }
             }
         }),
-        updateFlow: builder.mutation<Flow, { flow: Flow }>({
-            query: ({ flow }) => {
+        updateFlow: builder.mutation<Flow, Flow>({
+            query: (flow) => {
                 return {
-                    url: `/flows`,
-                    method: 'PATCH',
+                    url: `/flows/${flow._id}`,
+                    method: 'PUT',
                     body: flow
                 }
             }
         }),
-        deleteFlow: builder.mutation<FlowLight, { flow: FlowLight }>({
-            query: ({ flow }) => {
+        deleteFlow: builder.mutation<string, string>({
+            query: (flowId) => {
                 return {
-                    url: `/flows`,
-                    method: 'DELETE',
-                    body: flow
+                    url: `/flows/${flowId}`,
+                    method: 'DELETE'
                 }
             }
         }),
@@ -48,4 +48,4 @@ export const flowApi = createApi({
     }),
 })
 
-export const { useGetFlowsQuery, useGetFlowByAliasQuery, useLazySearchNodeQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation, useGetFlowByIdQuery } = flowApi;
+export const { useGetFlowsQuery, useGetFlowByAliasQuery, useGetFlowByIdQuery, useLazySearchNodeQuery, useLazyGetFlowByIdQuery, useDeleteFlowMutation, useCreateFlowMutation, useUpdateFlowMutation } = flowApi;

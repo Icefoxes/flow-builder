@@ -7,7 +7,8 @@ import {
     MinusCircleOutlined,
     PlusOutlined,
     DeleteOutlined,
-    EditOutlined
+    EditOutlined,
+    ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
 
@@ -176,14 +177,13 @@ const SelectFormList = (field: FormListFieldData) => (
     </Form.List>
 )
 
-const NodeTypeMetaContent: FC<{ item: NodeTypeMeta }> = ({ item }) => {
+const NodeTypeMetaContent: FC<{ editable: boolean, item: NodeTypeMeta }> = ({ editable, item }) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = useForm();
-    const [editable, setEditable] = useState<boolean>(false);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [createMeta] = useCreateMetaMutation();
     const [updateMeta] = useUpdateMetaMutation();
-    const [deleteMeta] = useDeleteMetaMutation();
+
 
     useEffect(() => {
         if (item.name === 'TO_BE_REPLACED') {
@@ -201,26 +201,26 @@ const NodeTypeMetaContent: FC<{ item: NodeTypeMeta }> = ({ item }) => {
                 form.validateFields().then(v => {
                     const toBeSaved = Object.assign({}, item, { ...(v as object) });
                     if (!!!toBeSaved._id) {
-                        createMeta({ meta: toBeSaved });
+                        createMeta(toBeSaved);
                         messageApi.success('create node type successfully');
                     } else {
-                        updateMeta({ meta: toBeSaved })
+                        updateMeta(toBeSaved)
                         messageApi.success('update node type successfully');
                     }
                 });
             }}
             form={form}>
 
-            <Form.Item name='name' label='Name' labelCol={{ span: 2 }} wrapperCol={{ span: 4 }} rules={[{ required: true, message: `Please input your name` }]}>
+            <Form.Item name='name' label='Name' labelCol={{ span: 2 }} wrapperCol={{ span: 8 }} rules={[{ required: true, message: `Please input your name` }]}>
                 <Input placeholder={`input Name`} />
             </Form.Item>
-            <Form.Item name='icon' label='Icons' labelCol={{ span: 2 }} wrapperCol={{ span: 4 }} rules={[{ required: true, message: `Please select` }]}>
+            <Form.Item name='icon' label='Icons' labelCol={{ span: 2 }} wrapperCol={{ span: 8 }} rules={[{ required: true, message: `Please select` }]}>
                 <Select>
                     {ICONS.map((opt, idx) => <Select.Option key={`${idx}`} value={idx}>{opt}</Select.Option>)}
                 </Select>
             </Form.Item>
 
-            <Form.Item name='functionalType' labelCol={{ span: 2 }} wrapperCol={{ span: 4 }} label="Functional Type" rules={[{ required: true, message: `Please select` }]}>
+            <Form.Item name='functionalType' labelCol={{ span: 2 }} wrapperCol={{ span: 8 }} label="Functional Type" rules={[{ required: true, message: `Please select` }]}>
                 <Radio.Group>
                     <Radio value="Processor"> Processor </Radio>
                     <Radio value="Storage"> Storage </Radio>
@@ -330,47 +330,63 @@ const NodeTypeMetaContent: FC<{ item: NodeTypeMeta }> = ({ item }) => {
                         Save
                     </Button>
                 </Form.Item>
-
-                <Form.Item>
-                    <Button type="primary" onClick={() => {
-                        deleteMeta({ meta: item });
-                        messageApi.success('delete node type successfully');
-                    }} >
-                        Delete
-                    </Button>
-                </Form.Item>
             </Space>
         </Form>
-
-        <Button type="primary" onClick={() => setEditable(!editable)} >
-            Edit
-        </Button>
     </>
 }
 
 export const NodeTypeTab: FC<{ items: NodeTypeMeta[] }> = ({ items }) => {
     const [createMeta] = useCreateMetaMutation();
+    const [deleteMeta] = useDeleteMetaMutation();
 
+    let mapper: Record<string, boolean> = {};
+    items.forEach(f => mapper[f._id] = false);
+    const [editableMap, setEditableMap] = useState<Record<string, boolean>>(mapper);
     return (
         <Tabs
-            tabBarExtraContent={<IoAddSharp onClick={() => {
-                createMeta({
-                    meta: {
+            tabBarStyle={{ minWidth: 150 }}
+            tabBarExtraContent={{
+                'left': <IoAddSharp className="meta-add-icon" size={20} onClick={() => {
+                    createMeta({
                         name: 'TO_BE_REPLACED',
                         functionalType: FunctionalTypeEnum.Processor,
                         attributes: [],
                         icon: 0,
-                    }
-                })
-            }} />}
+                    })
+                }} />
+            }}
             defaultActiveKey="1"
             tabPosition='left'
             style={{ height: '100%' }}
             items={[...items].sort((left, right) => left.name.localeCompare(right.name)).map((item, idx) => {
                 return {
-                    label: item.name,
+                    label: (
+                        <div style={{ width: 200, display: 'flex', justifyContent: 'space-between' }}>
+                            <span className="meta-action-logo">{item.name}</span>
+                            <div className="meta-action-bar">
+                                <EditOutlined className="meta-action-logo" onClick={() => {
+                                    let data = Object.assign({}, editableMap);
+                                    data[item._id] = !data[item._id];
+                                    setEditableMap(data);
+                                }} />
+                                <DeleteOutlined className="meta-action-logo" onClick={() => {
+                                    Modal.confirm({
+                                        title: 'Confirm',
+                                        icon: <ExclamationCircleOutlined />,
+                                        content: `Do you want to delete this meta ${item.name}`,
+                                        okText: 'Confirm',
+                                        cancelText: 'Cancel',
+                                        onOk: () => {
+                                            deleteMeta(item._id);
+                                            message.success(`deleted meta ${item.name}`);
+                                        }
+                                    });
+                                }} />
+                            </div>
+                        </div>
+                    ),
                     key: `${idx + 1}`,
-                    children: <NodeTypeMetaContent key={item.name} item={item} />
+                    children: <NodeTypeMetaContent key={item.name} item={item} editable={editableMap[item._id]} />
                 };
             })}
         />

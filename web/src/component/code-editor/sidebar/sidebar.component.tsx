@@ -13,9 +13,9 @@ import { FlowContextMenu, FlowContextMenuType, FLOW_SIDEBAR_MENU } from "./sideb
 import { TeamContextMenu, TeamContextMenuType, TEAM_SIDEBAR_MENU } from "./sidebar.team.context-menu";
 import { TeamCreateModal } from "./team.create.modal";
 
-import { useCreateFlowMutation, useCreateTeamMutation, useDeleteFlowMutation, useDeleteTeamMutation, useUpdateTeamMutation, useLazyGetFlowByIdQuery } from "../../../service";
+import { useLazyGetFlowByIdQuery } from "../../../service";
 
-import { Flow, FlowLight, Team } from "../../../model";
+import { Flow, FlowInfo, FlowLight, Team } from "../../../model";
 import utils from "../../shared/util";
 
 
@@ -26,21 +26,23 @@ interface EditorSidebarProps {
     teams: Team[];
     flows: FlowLight[];
     activeFlow: Flow | null;
+
+    createTeam: (team: Team) => void;
+    updateTeam: (team: Team) => void;
+    deleteTeam: (teamId: string) => void;
+    createFlow: (flow: FlowInfo) => void,
+    deleteFlow: (flowId: string) => void,
 }
 
 interface EditorSidebarModalState {
     activeTeam: Team | null,
-    teamCreateModalVisible: boolean
+    teamCreateModalVisible: boolean;
 }
 
-export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, activeFlow }) => {
+export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, activeFlow, createTeam, updateTeam, deleteTeam, createFlow, deleteFlow }) => {
     const navigate = useNavigate();
     // serivce
-    const [createTeam] = useCreateTeamMutation();
-    const [updateTeam] = useUpdateTeamMutation();
-    const [deleteTeam] = useDeleteTeamMutation();
-    const [createFlow] = useCreateFlowMutation();
-    const [deleteFlow] = useDeleteFlowMutation();
+
 
     const [getFlowById] = useLazyGetFlowByIdQuery();
     // menu
@@ -66,13 +68,13 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
     const onFlowContextMenu = (item: FlowContextMenuType, props?: any) => {
         const flow = props as FlowLight;
         switch (item) {
-            case FlowContextMenuType.Edit: {
-                if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                    getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+            case FlowContextMenuType.EditFlow: {
+                if (!!!activeFlow || (activeFlow._id !== flow._id)) {
+                    getFlowById({ id: flow._id }) // ==> setActiveFlow ==> Show on Editor
                 }
                 break;
             }
-            case FlowContextMenuType.Delete: {
+            case FlowContextMenuType.DeleteFlow: {
                 Modal.confirm({
                     title: 'Confirm',
                     icon: <ExclamationCircleOutlined />,
@@ -80,28 +82,26 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                     okText: 'Confirm',
                     cancelText: 'Cancel',
                     onOk: () => {
-                        deleteFlow({ flow });
+                        deleteFlow(flow._id);
                         message.success(`deleted flow ${flow.name}`);
                     }
                 });
                 break;
             }
-            case FlowContextMenuType.Copy: {
-                getFlowById({ id: flow.id }).unwrap().then(data => {
+            case FlowContextMenuType.CopyFlow: {
+                getFlowById({ id: flow._id }).unwrap().then(data => {
                     let text = JSON.stringify(data);
                     data?.nodes.forEach(n => {
                         const id = utils.newUUID();
                         text = text.replaceAll(n.id, id);
                     });
                     const copiedFlow = JSON.parse(text) as Flow;
-                    createFlow({
-                        flow: Object.assign({}, copiedFlow, {
-                            _id: undefined,
-                            id: utils.newUUID(),
-                            name: 'TO_BE_REPLACED',
-                            tag: undefined
-                        })
-                    });
+                    const { _id, tag, doc, ...restProps } = copiedFlow
+                    // copy teamId + nodes + edges + extensions, do not copy _id, doc, tag, alias and name
+                    createFlow(Object.assign({}, restProps, {
+                        alias: utils.newUUID(),
+                        name: 'TO_BE_REPLACED',
+                    }));
                 })
                 break;
             }
@@ -118,13 +118,13 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 break;
             }
             case TeamContextMenuType.AddFlow: {
-                const { id } = props;
-                createFlow({ flow: utils.newFlow(id) });
+                const { _id: teamId } = props;
+                createFlow(utils.newFlow(teamId));
                 break;
             }
             case TeamContextMenuType.DeleteTeam: {
                 const team = props as Team;
-                const flowsNotDeleted = flows.find(f => f.team === team.id);
+                const flowsNotDeleted = flows.find(f => f.teamId === team._id);
                 if (flowsNotDeleted) {
                     message.error(`please delete all flows under ${team.name} first`);
                     return;
@@ -136,7 +136,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                     okText: 'Confirm',
                     cancelText: 'Cancel',
                     onOk: () => {
-                        deleteTeam(team);
+                        deleteTeam(team._id);
                         message.success(`deleted team ${team.name}`);
                     }
                 });
@@ -171,7 +171,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
 
     const generateTreeData = () => {
         return teams.map(team => {
-            const tags = Array.from(new Set(flows.filter(flow => flow.tag && flow.team === team.id).map(flow => flow.tag)));
+            const tags = Array.from(new Set(flows.filter(flow => flow.tag && flow.teamId === team._id).map(flow => flow.tag)));
             return {
                 title: () => <div className="gnomon-tree-node" onContextMenu={e => {
                     showTeamContextMenu({
@@ -182,14 +182,14 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 }}>
                     <FcFolder className="prefix" />   {team.name}
                 </div>,
-                key: `${team.id}`,
+                key: `${team._id}`,
                 isLeaf: false,
-                children: [...[...flows.filter(flow => !!!flow.tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
+                children: [...[...flows.filter(flow => !!!flow.tag && flow.teamId === team._id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                     return {
                         title: () => <div className="gnomon-tree-node"
                             onDoubleClick={() => {
-                                if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                    getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                if (!!!activeFlow || (activeFlow._id !== flow._id)) {
+                                    getFlowById({ id: flow._id }) // ==> setActiveFlow ==> Show on Editor
                                 }
                             }}
                             onContextMenu={e => {
@@ -201,7 +201,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                             }}>
                             <FcBarChart className="prefix" /> {flow.name}
                         </div>,
-                        key: `${flow.id}`,
+                        key: `${flow._id}`,
                         isLeaf: true
                     } as DataNode
                 }), ...tags.sort().map(tag => {
@@ -209,14 +209,14 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                         title: () => <div className="gnomon-tree-node">
                             <FcBriefcase className="prefix" /> {tag}
                         </div>,
-                        key: `${team.id}-${tag}`,
+                        key: `${team._id}-${tag}`,
                         isLeaf: false,
-                        children: [...[...flows.filter(flow => flow.tag === tag && flow.team === team.id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
+                        children: [...[...flows.filter(flow => flow.tag === tag && flow.teamId === team._id)].sort((prev, next) => prev.name.localeCompare(next.name)).map(flow => {
                             return {
                                 title: () => <div className="gnomon-tree-node"
                                     onDoubleClick={() => {
-                                        if (!!!activeFlow || (activeFlow.id !== flow.id)) {
-                                            getFlowById({ id: flow.id }) // ==> setActiveFlow ==> Show on Editor
+                                        if (!!!activeFlow || (activeFlow._id !== flow._id)) {
+                                            getFlowById({ id: flow._id }) // ==> setActiveFlow ==> Show on Editor
                                         }
                                     }}
                                     onContextMenu={e => {
@@ -228,7 +228,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                                     }}>
                                     <FcBarChart className="prefix" /> {flow.name}
                                 </div>,
-                                key: `${flow.id}`,
+                                key: `${flow._id}`,
                                 isLeaf: true
                             } as DataNode
                         })]

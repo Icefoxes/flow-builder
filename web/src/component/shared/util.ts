@@ -71,16 +71,15 @@ const getNodeMetaDataByType = (name: string) => {
     return (JSON.parse(localStorage.getItem('META') || '[]') as NodeTypeMeta[]).find(x => x.name === name)?.attributes as AttributeInfo[];
 }
 
-const newFlow = (id: string) => {
+const newFlow = (teamId: string) => {
     return {
-        id: newUUID(),
-        team: id,
-        alias: id,
+        teamId: teamId,
+        alias: newUUID(),
         name: 'TO_BE_REPLACED',
         nodes: [],
         edges: [],
-        extension: []
-    } as Flow;
+        extensions: []
+    };
 }
 
 const utils = {
