@@ -28,18 +28,20 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
 
     const searchResult = (q: string, items: SearchItem[]) =>
         items.map((item) => {
+            const idx = item.nodeName.indexOf(q);
             return {
-                value: item.alias,
+                value: JSON.stringify(item),
                 label: (
                     <div
+                        key={item.nodeId}
                         style={{
                             display: 'flex',
                             justifyContent: 'space-between',
                         }}
                     >
                         <span>
-                            [{item.nodeType}] Found {q} on{' '}
-                            {item.nodeName}
+                            [{item.nodeType}] Found on{' '}
+                            {item.nodeName.substring(0, idx)} <strong>{q}</strong>    {item.nodeName.substring(idx + q.length, item.nodeName.length)}
                         </span>
                         <span>in flow {item.flowName} {items.length} results</span>
                     </div>
@@ -60,7 +62,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
 
     const onSelect = (value: string) => {
         setSearch('');
-        navigate(`flows/${value}`)
+        navigate(`flows/${JSON.parse(value).alias}`)
     };
 
     return <>

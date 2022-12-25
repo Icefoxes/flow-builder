@@ -68,6 +68,7 @@ export interface GnomonEdge {
 export interface SearchItem {
     flowId: string;
     flowName: string;
+    nodeId: string;
     nodeName: string;
     nodeType: string;
     alias: string;

@@ -41,6 +41,7 @@ const metaSchema = new Schema({
     icon: { type: Number, required: true },
     functionalType: { type: String, enums: Object.keys(FunctionalTypeEnum), required: true },
     attributes: [{
+        _id: false,
         type: { type: String, enums: Object.keys(AttributeType), required: true },
         name: { type: String, required: true },
         property: { type: String },
@@ -49,6 +50,7 @@ const metaSchema = new Schema({
         selections: { type: [] },
         default: { type: String },
         children: [{
+            _id: false,
             type: { type: String, required: true },
             name: { type: String, required: true },
             property: { type: String },

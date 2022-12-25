@@ -55,6 +55,7 @@ const flowSchema = new Schema({
     doc: { type: String },
     tag: { type: String },
     nodes: [{
+        _id: false,
         id: { type: String, required: true },
         data: {},
         position: {
@@ -63,12 +64,14 @@ const flowSchema = new Schema({
         }
     }],
     edges: [{
+        _id: false,
         id: { type: String, required: true },
         source: { type: String, required: true },
         target: { type: String, required: true },
         label: { type: String },
     }],
     extensions: [{
+        _id: false,
         component: { type: String, required: true },
         props: { },
     }]

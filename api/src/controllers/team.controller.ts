@@ -17,7 +17,17 @@ class TeamController {
             next(error);
         }
     }
-    
+
+    public getTeamOverview = async (req: Request, res: Response, next: NextFunction) => {
+        const teamId = req.query.teamId as string;
+        try {
+            const overview = await this.teamService.getTeamOverview(teamId);
+            res.json(overview);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     public getTeamById = async (req: Request, res: Response, next: NextFunction) => {
         const teamId = req.params.teamId;
         try {
@@ -25,7 +35,7 @@ class TeamController {
             if (!errors.isEmpty()) throw createValidationException(errors);
 
             const findTeam = await this.teamService.getTeamById(teamId);
-            if(!findTeam) throw new HttpException(404, `Team not found`)
+            if (!findTeam) throw new HttpException(404, `Team not found`)
             res.json(findTeam);
         } catch (error) {
             next(error);

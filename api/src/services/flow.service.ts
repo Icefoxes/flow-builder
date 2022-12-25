@@ -22,7 +22,7 @@ class FlowService {
             { $match: { nodes: { $elemMatch: { 'data.label': { $regex: text } } } } },
             { $unwind: "$nodes" },
             { $match: { 'nodes.data.label': { $regex: text } } },
-            { $project: { flowId: '$_id', flowName: '$name', nodeName: '$nodes.data.label', nodeType: '$nodes.data.nodeType', alias: '$nodes.alias', _id: 0 } },
+            { $project: { flowId: '$_id', flowName: '$name', nodeId: "$nodes.id", nodeName: '$nodes.data.label', nodeType: '$nodes.data.nodeType', alias: '$alias', _id: 0 } },
             { $limit: 5 }
         ]).exec();
     }

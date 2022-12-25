@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
+
 import { HttpException } from "../exceptions/HttpException";
 import teamModel, { Team } from "../models/team.model";
-
+import flowModel from "../models/flow.model";
 
 class TeamService {
     public async getTeams(): Promise<Team[]> {
@@ -10,6 +11,15 @@ class TeamService {
 
     public async getTeamById(teamId: string): Promise<Team | null> {
         return teamModel.findById(new ObjectId(teamId)).exec();
+    }
+
+    public async getTeamOverview(teamId: string) {
+        return await flowModel.aggregate([
+            { $match: { teamId: new ObjectId(teamId) } },
+            { $unwind: "$nodes" },
+            { $project: { name: "$nodes.data.label", type: "$nodes.data.nodeType" } },
+            { $group: { _id: "$type", count: { $sum: 1 } } }
+        ]).exec();
     }
 
     public async createTeam(team: Team): Promise<Team> {
