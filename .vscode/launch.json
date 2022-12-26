@@ -15,7 +15,7 @@
             "type": "node",
             "request": "launch",
             "name": "API",
-            "program": "${workspaceFolder}/api/src/server.ts",
+            "program": "${workspaceFolder}/api/src/index.ts",
             "preLaunchTask": "tsc: build - api/tsconfig.json",
             "console": "integratedTerminal",
             "env": {

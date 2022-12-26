@@ -179,6 +179,7 @@ export const DiagramComponent: FC<{
                 setEdges([...edges.filter(edge => edge.id !== selectedEdge.id)]);
                 break;
             case EdgeContextMenuType.EditEdge:
+                makeUndoSnapshot();
                 setCurrentEditable({ activeNode: null, activeEdge: selectedEdge, visible: true });
                 break;
         }
