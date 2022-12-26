@@ -1,5 +1,5 @@
 
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { NodeContextMenu } from './node.context-menu';
 import { FunctionalTypeEnum, GnomonNode, NodeTypeMeta } from '../../../model';
 
@@ -52,6 +52,6 @@ describe("NodeModalComponent", () => {
     it('renders title', () => {
         render(<NodeContextMenu onItemClick={(item, props) => {
 
-        }}/>);
+        }} />);
     });
 })

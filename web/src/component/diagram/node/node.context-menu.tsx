@@ -17,11 +17,11 @@ export interface ChangeNodeProps {
 }
 
 export enum NodeContextMenuType {
-    CreateNode = "Create",
-    CopyNode = "Copy",
-    ChangeNodeType = "ChangeType",
-    DeleteNode = "Delete",
-    EditNode = "Edit"
+    CreateNode = "CreateNode",
+    CopyNode = "CopyNode",
+    ChangeNodeType = "ChangeNodeType",
+    DeleteNode = "DeleteNode",
+    EditNode = "EditNode"
 }
 
 
