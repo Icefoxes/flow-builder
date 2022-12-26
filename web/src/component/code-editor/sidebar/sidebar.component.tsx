@@ -67,7 +67,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
 
     const naviagteToActiveFlow = (flow: FlowLight) => {
         if (!!!activeFlow || (activeFlow._id !== flow._id)) {
-            getFlowById({ id: flow._id }) // ==> setActiveFlow ==> Show on Editor
+            getFlowById(flow._id) // ==> setActiveFlow ==> Show on Editor
         }
     }
 
@@ -93,7 +93,7 @@ export const EditorSidebarComponent: FC<EditorSidebarProps> = ({ teams, flows, a
                 break;
             }
             case FlowContextMenuType.CopyFlow: {
-                getFlowById({ id: flow._id }).unwrap().then(data => {
+                getFlowById(flow._id).unwrap().then(data => {
                     let text = JSON.stringify(data);
                     data?.nodes.forEach(n => {
                         const id = utils.newUUID();

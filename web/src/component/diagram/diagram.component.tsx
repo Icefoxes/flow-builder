@@ -10,6 +10,7 @@ import ReactFlow, {
     NodeMouseHandler,
     EdgeMouseHandler,
     Edge,
+    useKeyPress,
 } from 'reactflow';
 import { useContextMenu } from "react-contexify";
 import { message, Modal } from "antd";
@@ -24,7 +25,7 @@ import './diagram.component.scss';
 import { NodeConfig, UserDefinedNode } from "./node";
 import { NodeContextMenuType, ChangeNodeProps, NODE_MENU_ID, NodeContextMenu } from './node/node.context-menu';
 import { EdgeModalComponent } from "./edge";
-import { DeleteEdgeProps, EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
+import { EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
 import { Flow, GnomonNode } from "../../model";
 
 import Utils from '../shared/util';
@@ -34,7 +35,6 @@ import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
 import { getDagreLayoutedElements } from "./dagre";
-import { useUpdateFlowMutation } from "../../service";
 
 
 
@@ -78,13 +78,13 @@ const UNDO_CAPICITY = 3;
 
 export const DiagramComponent: FC<{
     flow: Flow,
-}> = ({ flow }) => {
-    const [updateFlow] = useUpdateFlowMutation();
-    const [messageApi, contextHolder] = message.useMessage();
+    updateFlow: (flow: Flow) => void,
+}> = ({ flow, updateFlow }) => {
     // hooks
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const reactFlowInstance = useReactFlow();
+    const cmdAndSPressed = useKeyPress(['ControlLeft+s', 'Strg+s']);
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
         flow.nodes.map(n => Object.assign({}, n, { type: 'gnomon' })),
@@ -145,7 +145,6 @@ export const DiagramComponent: FC<{
                 setRedoSnapshot([]);
                 setUndoSnapshot([]);
                 updateFlow(updatedFlow);
-                messageApi.success('Saved Flow')
                 break;
             case ControlType.Edit:
                 setRedoSnapshot([]);
@@ -173,11 +172,14 @@ export const DiagramComponent: FC<{
     }
 
     const onEdgeContextMenuClick = (control: EdgeContextMenuType, props: any) => {
+        const selectedEdge = props as Edge;
         switch (control) {
             case EdgeContextMenuType.DeleteEdge:
-                const deleteProps = props as DeleteEdgeProps;
                 makeUndoSnapshot();
-                setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
+                setEdges([...edges.filter(edge => edge.id !== selectedEdge.id)]);
+                break;
+            case EdgeContextMenuType.EditEdge:
+                setCurrentEditable({ activeNode: null, activeEdge: selectedEdge, visible: true });
                 break;
         }
     }
@@ -298,6 +300,12 @@ export const DiagramComponent: FC<{
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    useEffect(() => {
+        if (cmdAndSPressed) {
+            updateFlow(Utils.transformFlowLight(nodes, edges, flow));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cmdAndSPressed]);
 
     const onDagreLayout = (direction: string) => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
@@ -312,8 +320,6 @@ export const DiagramComponent: FC<{
     };
 
     return <div className="diagram-container" >
-        {contextHolder}
-
         <DiagramToolBarComponent onClick={onContorlButtonClick} canUndo={undoSnapshot.length > 0} canRedo={redoSnapshot.length > 0} />
 
         <ReactFlow

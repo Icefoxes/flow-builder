@@ -11,10 +11,6 @@ export enum EdgeContextMenuType {
     DeleteEdge = "DeleteEdge",
 }
 
-export interface DeleteEdgeProps {
-    id: string;
-}
-
 export const EdgeContextMenu: FC<{ onItemClick: (item: EdgeContextMenuType, props?: any) => void }> = ({ onItemClick }) => {
 
     return <>

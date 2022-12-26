@@ -22,10 +22,12 @@ export const EdgeModalComponent: FC<EdgeModalProps> = ({ isModalOpen, toggleVisi
 
     const onOk = () => {
         form.validateFields()
-            .then(v => {
-                handleOk(Object.assign({}, activeEdge, {
-                    ...v
-                }));
+            .then(data => {
+                if (data) {
+                    handleOk(Object.assign({}, activeEdge, {
+                        ...data
+                    }));
+                }
                 toggleVisible();
             });
     }
