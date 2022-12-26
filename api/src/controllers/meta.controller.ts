@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 
-import {
-  createValidationException
-} from "../exceptions/HttpException";
+import { createValidationException } from "../exceptions/HttpException";
 import MetaService from "../services/meta.service";
 import { NodeTypeMeta } from "../models/meta.model";
 

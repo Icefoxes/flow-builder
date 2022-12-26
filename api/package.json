@@ -6,13 +6,10 @@
   "scripts": {
     "start": "npm run build && cross-env NODE_ENV=production node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
-    "build:tsc": "tsc && tsc-alias",
     "build-prod": "npx tsc --project tsconfig.build.json",
     "test": "jest",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix",
-    "deploy:prod": "npm run build && pm2 start ecosystem.config.js --only prod",
-    "deploy:dev": "pm2 start ecosystem.config.js --only dev",
     "build": "npx tsc"
   },
   "author": "",
