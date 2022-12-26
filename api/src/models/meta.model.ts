@@ -1,55 +1,66 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface NodeTypeMeta extends Document {
-    name: string;
-    icon: number;
-    functionalType: FunctionalTypeEnum;
-    attributes: AttributeInfo[];
+  name: string;
+  icon: number;
+  functionalType: FunctionalTypeEnum;
+  attributes: AttributeInfo[];
 }
 
 enum FunctionalTypeEnum {
-    Storage = "Storage",
-    Processor = "Processor",
-    External = "External",
+  Storage = "Storage",
+  Processor = "Processor",
+  External = "External",
 }
 
 interface AttributeInfo {
-    // for check box
-    default?: string;
-    // for selections
-    selections?: string[];
-    // for object
-    children?: AttributeInfo[];
+  // for check box
+  default?: string;
+  // for selections
+  selections?: string[];
+  // for object
+  children?: AttributeInfo[];
 
-    // common
-    type: AttributeType;
-    name: string;
-    property?: string;
-    required: boolean;
+  // common
+  type: AttributeType;
+  name: string;
+  property?: string;
+  required: boolean;
 }
 
 enum AttributeType {
-    Input = 'Input',
-    Selection = 'Selection',
-    CheckBox = 'CheckBox',
-    TextArea = 'TextArea',
-    List = 'List'
+  Input = "Input",
+  Selection = "Selection",
+  CheckBox = "CheckBox",
+  TextArea = "TextArea",
+  List = "List",
 }
 
-const metaSchema = new Schema({
+const metaSchema = new Schema(
+  {
     name: { type: String, required: true, unique: true },
     icon: { type: Number, required: true },
-    functionalType: { type: String, enums: Object.keys(FunctionalTypeEnum), required: true },
-    attributes: [{
+    functionalType: {
+      type: String,
+      enums: Object.keys(FunctionalTypeEnum),
+      required: true,
+    },
+    attributes: [
+      {
         _id: false,
-        type: { type: String, enums: Object.keys(AttributeType), required: true },
+        type: {
+          type: String,
+          enums: Object.keys(AttributeType),
+          required: true,
+        },
         name: { type: String, required: true },
         property: { type: String },
         required: { type: Boolean, required: true },
 
         selections: { type: [] },
         default: { type: String },
-        children: [{
+        children: [
+          {
             _id: false,
             type: { type: String, required: true },
             name: { type: String, required: true },
@@ -58,8 +69,12 @@ const metaSchema = new Schema({
 
             selections: { type: [] },
             default: { type: String },
-        }]
-    }]
-}, { timestamps: true });
+          },
+        ],
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model<NodeTypeMeta>('metas', metaSchema);
+export default mongoose.model<NodeTypeMeta>("metas", metaSchema);

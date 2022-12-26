@@ -1,4 +1,4 @@
-import { createApi, } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 import { Flow, FlowInfo, FlowLight, SearchItem } from '../model';
 import { SharedBaseQuery } from './shared';
 

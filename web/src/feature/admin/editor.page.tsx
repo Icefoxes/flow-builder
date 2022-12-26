@@ -2,12 +2,12 @@ import { FC, useEffect, useState } from "react"
 import { Layout, message } from "antd"
 import { Resizable } from "re-resizable";
 import { useDispatch, useSelector } from "react-redux";
+import { useContextMenu } from "react-contexify";
 
 import { CodeEditComponent, CodeEditProps, EditorSidebarComponent, TeamCreateModal, TEAM_SIDEBAR_MENU } from "../../component/code-editor"
 import { selectActiveFlow, selectFlows, selectTeams, setActiveFlow } from "./adminSlice";
 import { useCreateFlowMutation, useCreateTeamMutation, useDeleteFlowMutation, useDeleteTeamMutation, useUpdateFlowMutation, useUpdateTeamMutation } from "../../service";
 import './editor.page.scss';
-import { useContextMenu } from "react-contexify";
 import { Team } from "../../model";
 
 const { Sider } = Layout;
@@ -36,22 +36,12 @@ const EditorPage: FC = () => {
     const { show: showTeamContextMenu } = useContextMenu({
         id: TEAM_SIDEBAR_MENU
     });
-    // 
-    useEffect(() => {
-        if (error) {
-            messageApi.error((error as any)?.data?.message || 'unkonwn issue')
-        }
-    }, [messageApi, error]);
-
 
     const { createdAt, updatedAt, __v, ...restProps } = activeFlow || {};
 
-
     const props: CodeEditProps = {
         code: JSON.stringify(restProps || {}, undefined, 2),
-        onSaveFlow: (flow) => {
-            updateFlow(flow);
-        },
+        onSaveFlow: updateFlow,
         sidebarWidth,
         isLoading,
         activeFlow,
@@ -62,6 +52,12 @@ const EditorPage: FC = () => {
         createTeam(team);
         setTeamCreateModalVisible(false);
     }
+
+    useEffect(() => {
+        if (error) {
+            messageApi.error((error as any)?.data?.message || 'unkonwn issue')
+        }
+    }, [messageApi, error]);
 
     return <Layout className="edit-page-root">
         <Resizable

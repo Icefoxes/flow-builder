@@ -23,7 +23,7 @@ import 'reactflow/dist/style.css';
 import './diagram.component.scss';
 import { NodeConfig, UserDefinedNode } from "./node";
 import { NodeContextMenuType, ChangeNodeProps, NODE_MENU_ID, NodeContextMenu } from './node/node.context-menu';
-import { UserDefinedEdge } from "./edge";
+import { EdgeModalComponent } from "./edge";
 import { DeleteEdgeProps, EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
 import { Flow, GnomonNode } from "../../model";
 
@@ -42,9 +42,9 @@ const nodeTypes = {
     gnomon: UserDefinedNode
 }
 
-const edgeTypes = {
-    gnomon: UserDefinedEdge
-}
+// const edgeTypes = {
+//     gnomon: UserDefinedEdge
+// }
 
 const newNode = (nodes: Node<any>[], id: string) => {
     const x_max = nodes.length === 0 ? 100 : Math.max(...nodes.map(node => node.position.x));
@@ -68,6 +68,12 @@ interface EditState {
     edges: Edge[]
 }
 
+interface CurrentEditable {
+    activeNode: GnomonNode | null,
+    activeEdge: Edge | null,
+    visible: boolean
+}
+
 const UNDO_CAPICITY = 3;
 
 export const DiagramComponent: FC<{
@@ -81,7 +87,7 @@ export const DiagramComponent: FC<{
     const reactFlowInstance = useReactFlow();
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
-        flow.nodes.map(n => Object.assign({}, n, {type: 'gnomon'})),
+        flow.nodes.map(n => Object.assign({}, n, { type: 'gnomon' })),
         flow.edges
     );
 
@@ -91,8 +97,12 @@ export const DiagramComponent: FC<{
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
-    const [editNode, setEditNode] = useState<GnomonNode | null>(null);
-    const [editNodeVisible, setEditNodeVisible] = useState(false);
+
+    const [currentEditable, setCurrentEditable] = useState<CurrentEditable>({
+        activeEdge: null,
+        activeNode: null,
+        visible: false
+    });
     // context menu
     const { show: showNodeContextMenu } = useContextMenu({
         id: NODE_MENU_ID
@@ -164,7 +174,7 @@ export const DiagramComponent: FC<{
 
     const onEdgeContextMenuClick = (control: EdgeContextMenuType, props: any) => {
         switch (control) {
-            case EdgeContextMenuType.Delete:
+            case EdgeContextMenuType.DeleteEdge:
                 const deleteProps = props as DeleteEdgeProps;
                 makeUndoSnapshot();
                 setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
@@ -174,7 +184,7 @@ export const DiagramComponent: FC<{
 
     const onNodeContextMenuItemClick = (control: NodeContextMenuType, props: any) => {
         switch (control) {
-            case NodeContextMenuType.Create: {
+            case NodeContextMenuType.CreateNode: {
                 makeUndoSnapshot();
                 const current = props as GnomonNode;
                 setNodes([...nodes, Object.assign({}, newNode(nodes, Utils.newUUID()), {
@@ -185,7 +195,7 @@ export const DiagramComponent: FC<{
                 })]);
                 break;
             }
-            case NodeContextMenuType.ChangeType: {
+            case NodeContextMenuType.ChangeNodeType: {
                 makeUndoSnapshot();
                 const data = props as ChangeNodeProps;
                 const found = nodes.find(node => node.id === data.id) as Node;
@@ -199,7 +209,7 @@ export const DiagramComponent: FC<{
                 break;
             }
 
-            case NodeContextMenuType.Delete: {
+            case NodeContextMenuType.DeleteNode: {
                 const data = props as GnomonNode;
                 Modal.confirm({
                     title: 'Confirm',
@@ -216,13 +226,12 @@ export const DiagramComponent: FC<{
                 });
                 break;
             }
-            case NodeContextMenuType.Edit: {
+            case NodeContextMenuType.EditNode: {
                 const node = props as GnomonNode;
-                setEditNode(node);
-                setEditNodeVisible(true);
+                setCurrentEditable({ activeNode: node, activeEdge: null, visible: true });
                 break;
             }
-            case NodeContextMenuType.Copy: {
+            case NodeContextMenuType.CopyNode: {
                 const node = props as GnomonNode;
                 makeUndoSnapshot();
                 setNodes([...nodes, {
@@ -313,7 +322,7 @@ export const DiagramComponent: FC<{
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
+            // edgeTypes={edgeTypes}
             snapToGrid={true}
             onNodeClick={onNodeClick}
             onContextMenu={(event) => {
@@ -333,13 +342,21 @@ export const DiagramComponent: FC<{
         <NodeContextMenu onItemClick={onNodeContextMenuItemClick} />
         <EdgeContextMenu onItemClick={onEdgeContextMenuClick} />
         <DiagramContextMenu onItemClick={onDiagramContextMenuClick} />
-        {editNode && <NodeModalComponent
-            node={editNode}
-            isModalOpen={editNodeVisible}
-            toggleVisible={() => setEditNodeVisible(!editNodeVisible)}
+        {currentEditable.activeNode && <NodeModalComponent
+            node={currentEditable.activeNode}
+            isModalOpen={currentEditable.visible}
+            toggleVisible={() => setCurrentEditable({ activeNode: null, activeEdge: null, visible: false })}
             handleOk={(event) => {
                 makeUndoSnapshot();
                 setNodes([...nodes.filter(node => node.id !== event.id), event])
+            }} />}
+        {currentEditable.activeEdge && <EdgeModalComponent
+            activeEdge={currentEditable.activeEdge}
+            isModalOpen={currentEditable.visible}
+            toggleVisible={() => setCurrentEditable({ activeNode: null, activeEdge: null, visible: false })}
+            handleOk={(event) => {
+                makeUndoSnapshot();
+                setEdges([...edges.filter(e => e.id !== event.id), event])
             }} />}
     </div>
 }

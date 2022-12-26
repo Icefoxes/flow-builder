@@ -5,33 +5,38 @@ import { RoutesMap } from "../core/routes";
 import MetaController from "../controllers/meta.controller";
 
 class MetasRoute implements RoutesMap {
-    public path = '/api/v1/metas';
-    public router = Router();
-    public metaController = new MetaController();
+  public path = "/api/v1/metas";
+  public router = Router();
+  public metaController = new MetaController();
 
-    constructor() {
-        this.initializeRoutes();
-    }
+  constructor() {
+    this.initializeRoutes();
+  }
 
-    private initializeRoutes() {
-        this.router.get(`${this.path}`,
-            this.metaController.getMetas);
+  private initializeRoutes() {
+    this.router.get(`${this.path}`, this.metaController.getMetas);
 
-        this.router.post(`${this.path}`,
-            body(['name', 'icon', 'functionalType']).notEmpty(),
-            body(['attributes']).isArray(),
-            this.metaController.createMeta);
+    this.router.post(
+      `${this.path}`,
+      body(["name", "icon", "functionalType"]).notEmpty(),
+      body(["attributes"]).isArray(),
+      this.metaController.createMeta
+    );
 
-        this.router.put(`${this.path}/:metaId`,
-            body(['name', 'icon', 'functionalType']).notEmpty(),
-            body(['attributes']).isArray(),
-            param('metaId').notEmpty(),
-            this.metaController.updateMeta);
+    this.router.put(
+      `${this.path}/:metaId`,
+      body(["name", "icon", "functionalType"]).notEmpty(),
+      body(["attributes"]).isArray(),
+      param("metaId").notEmpty(),
+      this.metaController.updateMeta
+    );
 
-        this.router.delete(`${this.path}/:metaId`,
-            param('metaId').notEmpty(),
-            this.metaController.deleteMeta);
-    }
+    this.router.delete(
+      `${this.path}/:metaId`,
+      param("metaId").notEmpty(),
+      this.metaController.deleteMeta
+    );
+  }
 }
 
 export default MetasRoute;

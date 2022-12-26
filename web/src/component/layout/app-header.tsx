@@ -40,8 +40,8 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
                         }}
                     >
                         <span>
-                            [{item.nodeType}] Found on{' '}
-                            {item.nodeName.substring(0, idx)} <strong>{q}</strong>    {item.nodeName.substring(idx + q.length, item.nodeName.length)}
+                            [{item.nodeType}] Found {' '}
+                            {item.nodeName.substring(0, idx)}<strong>{q}</strong>{item.nodeName.substring(idx + q.length, item.nodeName.length)}
                         </span>
                         <span>in flow {item.flowName} {items.length} results</span>
                     </div>
