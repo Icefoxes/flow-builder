@@ -35,7 +35,7 @@ export const EdgeModalComponent: FC<EdgeModalProps> = ({ isModalOpen, toggleVisi
     return <Modal
         forceRender
         keyboard
-        title='Node Info'
+        title='Edge Info'
         open={isModalOpen}
         onOk={onOk}
         onCancel={toggleVisible}>
