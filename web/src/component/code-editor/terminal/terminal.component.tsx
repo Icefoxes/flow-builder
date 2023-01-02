@@ -28,7 +28,7 @@ export const TerminalComponent: FC<TerminalProps> = ({ onNodeType, width }) => {
             Welcome to Gnomon, type "help" for all available commands.<br />
         </span>
     )
-    return <>
+    return (
         <Resizable
             className="terminal-resizable"
             defaultSize={{
@@ -64,5 +64,5 @@ export const TerminalComponent: FC<TerminalProps> = ({ onNodeType, width }) => {
                 commands={commands}
             />
         </Resizable>
-    </>
+    )
 }

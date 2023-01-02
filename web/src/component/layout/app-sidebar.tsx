@@ -39,7 +39,7 @@ const RandomInt = (v: string): number => {
 export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
     const teams = useSelector(selectTeams);
     const flows = useSelector(selectFlows);
-    return <>
+    return (
         <Sider trigger={null} collapsible collapsed={collapsed}>
             <div className="logo-container">
                 <FcStumbleupon className="logo" />
@@ -88,5 +88,5 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                 ]}
             />
         </Sider>
-    </>
+    )
 }

@@ -75,32 +75,32 @@ const AdditionalInfoList = (name: string, label: string, infos: AttributeInfo[])
 
 
                             if (info.type === AttributeType.Input) {
-                                return <>
+                                return (
                                     <Form.Item {...props}>
                                         <Input placeholder={`input ${info.name}`} />
                                     </Form.Item>
-                                </>
+                                )
                             }
                             else if (info.type === AttributeType.Selection && info.selections) {
-                                return <>
+                                return (
                                     <Form.Item {...props}>
                                         <Select>
                                             {info.selections.map(opt => <Select.Option key={`${info.name}-${opt}`} value={opt}>{opt}</Select.Option>)}
                                         </Select>
                                     </Form.Item>
-                                </>
+                                )
                             }
                             else if (info.type === AttributeType.CheckBox) {
-                                return <>
+                                return (
                                     <Form.Item {...props} valuePropName="checked">
                                         <Checkbox defaultChecked={true} />
                                     </Form.Item>
-                                </>
+                                )
                             }
-                            return <>
+                            return (
                                 <Form.Item {...props} noStyle>
                                 </Form.Item>
-                            </>
+                            )
                         })}
                         <MinusCircleOutlined style={{ margin: '8px 0 0 0' }} onClick={() => remove(field.name)} />
                     </Space>
@@ -194,39 +194,37 @@ export const NodeModalComponent: FC<NodeModalProps> = ({ isModalOpen, toggleVisi
                 };
 
                 if (info.type === AttributeType.Input) {
-                    return <>
+                    return (
                         <Form.Item {...props} >
                             <Input placeholder={`input ${info.name}`} />
                         </Form.Item>
-                    </>
+                    )
                 }
                 else if (info.type === AttributeType.Selection && info.selections) {
-                    return <>
+                    return (
                         <Form.Item {...props} >
                             <Select>
                                 {(info.selections).map(opt => <Select.Option key={`${node.id}-${fieldName}-${opt}`} value={opt}>{opt}</Select.Option>)}
                             </Select>
                         </Form.Item>
-                    </>
+                    )
                 }
                 else if (info.type === AttributeType.CheckBox) {
-                    return <>
+                    return (
                         <Form.Item {...props} valuePropName="checked">
                             <Checkbox defaultChecked={true} />
                         </Form.Item>
-                    </>
+                    )
                 }
                 else if (info.type === AttributeType.TextArea) {
-                    return <>
+                    return (
                         <Form.Item {...props}>
                             <TextArea rows={4} />
                         </Form.Item>
-                    </>
+                    )
                 }
                 else if (info.type === AttributeType.ListObject && info.children) {
-                    return <>
-                        {AdditionalInfoList(info.name, info.name, info.children)}
-                    </>
+                    return AdditionalInfoList(info.name, info.name, info.children)
                 }
                 return <></>
             })}

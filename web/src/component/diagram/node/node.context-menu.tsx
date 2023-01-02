@@ -27,7 +27,7 @@ export enum NodeContextMenuType {
 
 export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, props?: any) => void }> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu id={NODE_MENU_ID}>
             <Item key='create' onClick={({ props }) => onItemClick(NodeContextMenuType.CreateNode, props)}>
                 Add Node
@@ -77,5 +77,5 @@ export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, prop
                 })}
             </Submenu>
         </Menu>
-    </>
+    )
 }

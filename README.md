@@ -1,5 +1,5 @@
-# app-flow
-tools used to visualize application flow
+# Flow Builder
+a web tool built by React to visualize application data processing. 
 
 # How-to Start 
 
@@ -9,8 +9,5 @@ cd app-flow
 docker-compose up
 ```
 
-## TODO
-1. read /edit flow mode
-
-## Bug
-1. sidebar toggle, editor not adapt
+# Demo
+![alt text](./doc/example.gif "demo")

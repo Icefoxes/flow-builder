@@ -16,9 +16,7 @@ const ActiveDiagramEditPage = React.lazy(() => import('../feature/admin/active.d
 const MetaPage = React.lazy(() => import('../feature/admin/meta.page'));
 
 const LoadPage: FC = () => {
-    return <>
-        <Spin style={{ width: '100%', height: '100%', backgroundColor: '#1e1e1e', display: 'flex', alignItems: 'center', justifyContent: 'center' }} size="large" spinning={true} />
-    </>
+    return <Spin style={{ width: '100%', height: '100%', backgroundColor: '#1e1e1e', display: 'flex', alignItems: 'center', justifyContent: 'center' }} size="large" spinning={true} />
 }
 
 const router = createBrowserRouter([
@@ -28,11 +26,11 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <>
+                element: (
                     <Suspense fallback={<LoadPage />}>
                         <EditorPage />
                     </Suspense>
-                </>
+                )
             },
             {
                 path: 'flows/:diagramId',
@@ -64,7 +62,5 @@ export const RootRouter: FC = () => {
     useGetTeamsQuery();
     useGetFlowsQuery();
     useGetMetaQuery();
-    return <>
-        <RouterProvider router={router} />
-    </>
+    return <RouterProvider router={router} />
 }

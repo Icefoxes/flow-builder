@@ -5,10 +5,7 @@ import { CodeViewerComponent } from "../../component";
 
 const CodePage: FC = () => {
     const activeFlow = useSelector(selectActiveFlow);
-    return <>
-        {activeFlow && <CodeViewerComponent code={JSON.stringify(activeFlow, undefined, 2)} />}
-
-    </>
+    return activeFlow && <CodeViewerComponent code={JSON.stringify(activeFlow, undefined, 2)} />
 }
 
 export default CodePage;

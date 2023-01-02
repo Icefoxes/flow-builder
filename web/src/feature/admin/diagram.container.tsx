@@ -20,14 +20,12 @@ export const ActiveDiagramContent: FC<{ flow: Flow, isLoading?: boolean }> = ({ 
         }
     }, [messageApi, isSuccess, error]);
 
-    return <>
+    return (
         <ReactFlowProvider>
-            {(!isLoading && flow) && <>
-                <DiagramComponent key={flow._id} flow={flow} updateFlow={updateFlow} />
-            </>}
+            {(!isLoading && flow) && <DiagramComponent key={flow._id} flow={flow} updateFlow={updateFlow} />}
+            {contextHolder}
         </ReactFlowProvider>
-        {contextHolder}
-    </>
+    )
 }
 
 export const DiagramContent: FC<{ diagramId: string }> = ({ diagramId }) => {

@@ -65,12 +65,12 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
         navigate(`flows/${JSON.parse(value).alias}`)
     };
 
-    return <>
+    return (
         <Header id="gnomon-header" >
             {/* {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                className: 'trigger',
-                onClick: () => setCollapsed(!collapsed),
-            })} */}
+            className: 'trigger',
+            onClick: () => setCollapsed(!collapsed),
+        })} */}
 
             <AutoComplete
                 className="auto-complete"
@@ -95,5 +95,5 @@ export const AppHeader: FC<AppHeaderProps> = ({ setCollapsed, collapsed, onAbout
                 </span>
             </div>
         </Header>
-    </>
+    )
 }

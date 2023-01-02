@@ -6,7 +6,7 @@ import 'prismjs/components/prism-json';
 import 'prismjs/themes/prism-okaidia.css';
 
 export const CodeViewerComponent: FC<{ code: string }> = ({ code }) => {
-    return <>
+    return (
         <Editor
             value={code}
             readOnly={true}
@@ -21,5 +21,5 @@ export const CodeViewerComponent: FC<{ code: string }> = ({ code }) => {
                 background: 'black'
             }}
         />
-    </>
+    )
 }

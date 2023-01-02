@@ -13,7 +13,7 @@ export enum EdgeContextMenuType {
 
 export const EdgeContextMenu: FC<{ onItemClick: (item: EdgeContextMenuType, props?: any) => void }> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu id={EDGE_MENU_ID}>
             <Item onClick={({ props }) => onItemClick(EdgeContextMenuType.EditEdge, props)} >
                 Edit Edge
@@ -23,5 +23,5 @@ export const EdgeContextMenu: FC<{ onItemClick: (item: EdgeContextMenuType, prop
                 Remove Edge
             </Item>
         </Menu>
-    </>
+    )
 }

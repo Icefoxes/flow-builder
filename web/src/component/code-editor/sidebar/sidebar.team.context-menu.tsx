@@ -24,7 +24,7 @@ interface TeamContextMenuProps {
 
 export const TeamContextMenu: FC<TeamContextMenuProps> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu theme={'dark'} id={TEAM_SIDEBAR_MENU}>
             <Item key={'create'}
                 hidden={({ props }) => {
@@ -70,5 +70,5 @@ export const TeamContextMenu: FC<TeamContextMenuProps> = ({ onItemClick }) => {
                 Edit Meta
             </Item>
         </Menu>
-    </>
+    )
 }
