@@ -7,7 +7,7 @@ interface AboutModalProps {
 }
 
 export const AboutModal: FC<AboutModalProps> = ({ isModalOpen, handleOk }) => {
-    return <>
+    return (
         <Modal title="About" open={isModalOpen} footer={[
             <Button key="back" onClick={handleOk}>
                 OK
@@ -16,5 +16,5 @@ export const AboutModal: FC<AboutModalProps> = ({ isModalOpen, handleOk }) => {
 
             <p>Copyright @2022</p>
         </Modal>
-    </>
+    )
 }

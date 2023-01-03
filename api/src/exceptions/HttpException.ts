@@ -11,7 +11,12 @@ export class HttpException extends Error {
   }
 }
 
-
 export const createValidationException = (errors: Result<ValidationError>) => {
-  return new HttpException(400, errors.array().map(f => `${f.param}: ${f.msg}`).join('|'));
-}
+  return new HttpException(
+    400,
+    errors
+      .array()
+      .map((f) => `${f.param}: ${f.msg}`)
+      .join("|")
+  );
+};

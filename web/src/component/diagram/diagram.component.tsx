@@ -10,6 +10,7 @@ import ReactFlow, {
     NodeMouseHandler,
     EdgeMouseHandler,
     Edge,
+    useKeyPress,
 } from 'reactflow';
 import { useContextMenu } from "react-contexify";
 import { message, Modal } from "antd";
@@ -23,8 +24,8 @@ import 'reactflow/dist/style.css';
 import './diagram.component.scss';
 import { NodeConfig, UserDefinedNode } from "./node";
 import { NodeContextMenuType, ChangeNodeProps, NODE_MENU_ID, NodeContextMenu } from './node/node.context-menu';
-import { UserDefinedEdge } from "./edge";
-import { DeleteEdgeProps, EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
+import { EdgeModalComponent } from "./edge";
+import { EdgeContextMenu, EdgeContextMenuType, EDGE_MENU_ID } from "./edge/edge.context-menu";
 import { Flow, GnomonNode } from "../../model";
 
 import Utils from '../shared/util';
@@ -34,7 +35,6 @@ import { getDiff, NodeModalComponent } from "./node/node.modal";
 import { DiagramContextMenu, DiagramContextMenuType, DIAGRAM_MENU_ID } from "./diagram.context-menu";
 import utils from "../shared/util";
 import { getDagreLayoutedElements } from "./dagre";
-import { useUpdateFlowMutation } from "../../service";
 
 
 
@@ -42,9 +42,9 @@ const nodeTypes = {
     gnomon: UserDefinedNode
 }
 
-const edgeTypes = {
-    gnomon: UserDefinedEdge
-}
+// const edgeTypes = {
+//     gnomon: UserDefinedEdge
+// }
 
 const newNode = (nodes: Node<any>[], id: string) => {
     const x_max = nodes.length === 0 ? 100 : Math.max(...nodes.map(node => node.position.x));
@@ -68,20 +68,26 @@ interface EditState {
     edges: Edge[]
 }
 
+interface CurrentEditable {
+    activeNode: GnomonNode | null,
+    activeEdge: Edge | null,
+    visible: boolean
+}
+
 const UNDO_CAPICITY = 3;
 
 export const DiagramComponent: FC<{
     flow: Flow,
-}> = ({ flow }) => {
-    const [updateFlow] = useUpdateFlowMutation();
-    const [messageApi, contextHolder] = message.useMessage();
+    updateFlow: (flow: Flow) => void,
+}> = ({ flow, updateFlow }) => {
     // hooks
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const reactFlowInstance = useReactFlow();
+    const cmdAndSPressed = useKeyPress(['ControlLeft+s', 'Strg+s']);
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
-        flow.nodes.map(n => Object.assign({}, n, {type: 'gnomon'})),
+        flow.nodes.map(n => Object.assign({}, n, { type: 'gnomon' })),
         flow.edges
     );
 
@@ -91,8 +97,12 @@ export const DiagramComponent: FC<{
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
-    const [editNode, setEditNode] = useState<GnomonNode | null>(null);
-    const [editNodeVisible, setEditNodeVisible] = useState(false);
+
+    const [currentEditable, setCurrentEditable] = useState<CurrentEditable>({
+        activeEdge: null,
+        activeNode: null,
+        visible: false
+    });
     // context menu
     const { show: showNodeContextMenu } = useContextMenu({
         id: NODE_MENU_ID
@@ -135,7 +145,6 @@ export const DiagramComponent: FC<{
                 setRedoSnapshot([]);
                 setUndoSnapshot([]);
                 updateFlow(updatedFlow);
-                messageApi.success('Saved Flow')
                 break;
             case ControlType.Edit:
                 setRedoSnapshot([]);
@@ -163,18 +172,22 @@ export const DiagramComponent: FC<{
     }
 
     const onEdgeContextMenuClick = (control: EdgeContextMenuType, props: any) => {
+        const selectedEdge = props as Edge;
         switch (control) {
-            case EdgeContextMenuType.Delete:
-                const deleteProps = props as DeleteEdgeProps;
+            case EdgeContextMenuType.DeleteEdge:
                 makeUndoSnapshot();
-                setEdges([...edges.filter(edge => edge.id !== deleteProps.id)]);
+                setEdges([...edges.filter(edge => edge.id !== selectedEdge.id)]);
+                break;
+            case EdgeContextMenuType.EditEdge:
+                makeUndoSnapshot();
+                setCurrentEditable({ activeNode: null, activeEdge: selectedEdge, visible: true });
                 break;
         }
     }
 
     const onNodeContextMenuItemClick = (control: NodeContextMenuType, props: any) => {
         switch (control) {
-            case NodeContextMenuType.Create: {
+            case NodeContextMenuType.CreateNode: {
                 makeUndoSnapshot();
                 const current = props as GnomonNode;
                 setNodes([...nodes, Object.assign({}, newNode(nodes, Utils.newUUID()), {
@@ -185,7 +198,7 @@ export const DiagramComponent: FC<{
                 })]);
                 break;
             }
-            case NodeContextMenuType.ChangeType: {
+            case NodeContextMenuType.ChangeNodeType: {
                 makeUndoSnapshot();
                 const data = props as ChangeNodeProps;
                 const found = nodes.find(node => node.id === data.id) as Node;
@@ -199,7 +212,7 @@ export const DiagramComponent: FC<{
                 break;
             }
 
-            case NodeContextMenuType.Delete: {
+            case NodeContextMenuType.DeleteNode: {
                 const data = props as GnomonNode;
                 Modal.confirm({
                     title: 'Confirm',
@@ -216,13 +229,12 @@ export const DiagramComponent: FC<{
                 });
                 break;
             }
-            case NodeContextMenuType.Edit: {
+            case NodeContextMenuType.EditNode: {
                 const node = props as GnomonNode;
-                setEditNode(node);
-                setEditNodeVisible(true);
+                setCurrentEditable({ activeNode: node, activeEdge: null, visible: true });
                 break;
             }
-            case NodeContextMenuType.Copy: {
+            case NodeContextMenuType.CopyNode: {
                 const node = props as GnomonNode;
                 makeUndoSnapshot();
                 setNodes([...nodes, {
@@ -289,6 +301,12 @@ export const DiagramComponent: FC<{
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    useEffect(() => {
+        if (cmdAndSPressed) {
+            updateFlow(Utils.transformFlowLight(nodes, edges, flow));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cmdAndSPressed]);
 
     const onDagreLayout = (direction: string) => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getDagreLayoutedElements(
@@ -303,8 +321,6 @@ export const DiagramComponent: FC<{
     };
 
     return <div className="diagram-container" >
-        {contextHolder}
-
         <DiagramToolBarComponent onClick={onContorlButtonClick} canUndo={undoSnapshot.length > 0} canRedo={redoSnapshot.length > 0} />
 
         <ReactFlow
@@ -313,7 +329,7 @@ export const DiagramComponent: FC<{
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
+            // edgeTypes={edgeTypes}
             snapToGrid={true}
             onNodeClick={onNodeClick}
             onContextMenu={(event) => {
@@ -333,13 +349,21 @@ export const DiagramComponent: FC<{
         <NodeContextMenu onItemClick={onNodeContextMenuItemClick} />
         <EdgeContextMenu onItemClick={onEdgeContextMenuClick} />
         <DiagramContextMenu onItemClick={onDiagramContextMenuClick} />
-        {editNode && <NodeModalComponent
-            node={editNode}
-            isModalOpen={editNodeVisible}
-            toggleVisible={() => setEditNodeVisible(!editNodeVisible)}
+        {currentEditable.activeNode && <NodeModalComponent
+            node={currentEditable.activeNode}
+            isModalOpen={currentEditable.visible}
+            toggleVisible={() => setCurrentEditable({ activeNode: null, activeEdge: null, visible: false })}
             handleOk={(event) => {
                 makeUndoSnapshot();
                 setNodes([...nodes.filter(node => node.id !== event.id), event])
+            }} />}
+        {currentEditable.activeEdge && <EdgeModalComponent
+            activeEdge={currentEditable.activeEdge}
+            isModalOpen={currentEditable.visible}
+            toggleVisible={() => setCurrentEditable({ activeNode: null, activeEdge: null, visible: false })}
+            handleOk={(event) => {
+                makeUndoSnapshot();
+                setEdges([...edges.filter(e => e.id !== event.id), event])
             }} />}
     </div>
 }

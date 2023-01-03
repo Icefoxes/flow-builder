@@ -52,7 +52,7 @@ export const ICONS = [<SiApacheflink className="logo" />,
 
 <SiGraphql className="logo" />,
 <SiSpringboot className="logo" />,
-<SiRedhatopenshift className="logo" />,
+<SiRedhatopenshift className="logo" color='black' />,
 <SiDocker className="logo" />,
 <SiApachehive className="logo" />,
 <SiApachedruid className="logo" />,

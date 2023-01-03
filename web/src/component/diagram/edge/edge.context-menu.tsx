@@ -3,31 +3,25 @@ import {
     Item,
     Menu,
 } from "react-contexify";
-import { GnomonEdge } from "../../../model";
 
 export const EDGE_MENU_ID = "EDGE_MENU";
 
 export enum EdgeContextMenuType {
-    Create = "Create",
-    Delete = "Delete",
-}
-
-export interface DeleteEdgeProps {
-    id: string;
+    EditEdge = "EditEdge",
+    DeleteEdge = "DeleteEdge",
 }
 
 export const EdgeContextMenu: FC<{ onItemClick: (item: EdgeContextMenuType, props?: any) => void }> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu id={EDGE_MENU_ID}>
-            <Item onClick={({ props }) => {
-                const edge = props as GnomonEdge;
-                onItemClick(EdgeContextMenuType.Delete, {
-                    id: edge.id
-                } as DeleteEdgeProps)
-            }}>
+            <Item onClick={({ props }) => onItemClick(EdgeContextMenuType.EditEdge, props)} >
+                Edit Edge
+            </Item>
+
+            <Item onClick={({ props }) => onItemClick(EdgeContextMenuType.DeleteEdge, props)} >
                 Remove Edge
             </Item>
         </Menu>
-    </>
+    )
 }

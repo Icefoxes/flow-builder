@@ -1,4 +1,4 @@
-import { createApi, } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 import { Flow, FlowInfo, FlowLight, SearchItem } from '../model';
 import { SharedBaseQuery } from './shared';
 
@@ -10,11 +10,11 @@ export const flowApi = createApi({
         getFlows: builder.query<FlowLight[], void>({
             query: () => `/flows`
         }),
-        getFlowById: builder.query<Flow, { id: string }>({
-            query: ({ id }) => `/flows/${id}`
+        getFlowById: builder.query<Flow, string>({
+            query: (id) => `/flows/${id}`
         }),
-        getFlowByAlias: builder.query<Flow, { alias: string }>({
-            query: ({ alias }) => `/flows?alias=${alias}`
+        getFlowByAlias: builder.query<Flow, string>({
+            query: (alias) => `/flows?alias=${alias}`
         }),
         createFlow: builder.mutation<Flow, FlowInfo>({
             query: (flow) => {

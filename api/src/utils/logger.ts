@@ -1,15 +1,16 @@
-import log4js from 'log4js';
+import log4js from "log4js";
 
 log4js.configure({
-    appenders: {
-        app: {
-            type: "dateFile",
-            filename: "/tmp/logs/app.log",
-            pattern: "yyyy-MM-dd",
-            compress: true,
-        }, out: { type: "stdout" }
+  appenders: {
+    app: {
+      type: "dateFile",
+      filename: "/tmp/logs/app.log",
+      pattern: "yyyy-MM-dd",
+      compress: true,
     },
-    categories: { default: { appenders: ["app"], level: "info" } },
+    out: { type: "stdout" },
+  },
+  categories: { default: { appenders: ["app"], level: "info" } },
 });
 
 export const logger = log4js.getLogger();

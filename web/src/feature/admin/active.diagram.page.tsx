@@ -7,9 +7,7 @@ import { ActiveDiagramContent } from "./diagram.container";
 
 const ActiveDiagramEditPage: FC = () => {
     const activeFlow = useSelector(selectActiveFlow);
-    return <>
-        <ActiveDiagramContent flow={activeFlow as Flow} />
-    </>
+    return <ActiveDiagramContent flow={activeFlow as Flow} />
 };
 
 export default ActiveDiagramEditPage;

@@ -30,16 +30,16 @@ const RandomInt = (v: string): number => {
     if (v.length === 0) {
         return 0;
     }
-    if (v.length < 3 && v.length > 0) {
+    if (v.length < 23 && v.length > 0) {
         return (v.charCodeAt(1)) % ICONS.length
     }
-    return (v.charCodeAt(3) + v.charCodeAt(4) + v.charCodeAt(5) + v.charCodeAt(6)) % ICONS.length
+    return (v.charCodeAt(15) + v.charCodeAt(6) + v.charCodeAt(5) + v.charCodeAt(10) + v.charCodeAt(11)) % ICONS.length
 }
 
 export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
     const teams = useSelector(selectTeams);
     const flows = useSelector(selectFlows);
-    return <>
+    return (
         <Sider trigger={null} collapsible collapsed={collapsed}>
             <div className="logo-container">
                 <FcStumbleupon className="logo" />
@@ -88,5 +88,5 @@ export const AppSidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                 ]}
             />
         </Sider>
-    </>
+    )
 }

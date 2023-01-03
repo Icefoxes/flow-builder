@@ -37,7 +37,7 @@ export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalO
             form.setFieldsValue(activeTeam);
         }
     }, [activeTeam, form, isModalOpen]);
-    return <>
+    return (
         <Modal title="Team Info"
             forceRender
             keyboard
@@ -66,5 +66,5 @@ export const TeamCreateModal: FC<TeamCreateModalProps> = ({ activeTeam, isModalO
                 </Form.Item>
             </Form>
         </Modal>
-    </>
+    )
 }

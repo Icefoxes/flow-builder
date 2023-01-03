@@ -21,7 +21,7 @@ interface FlowContextMenuProps {
 
 export const FlowContextMenu: FC<FlowContextMenuProps> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu theme={'dark'} id={FLOW_SIDEBAR_MENU}>
             <Item onClick={({ props }) => {
                 const flow = props as Flow;
@@ -44,5 +44,5 @@ export const FlowContextMenu: FC<FlowContextMenuProps> = ({ onItemClick }) => {
                 Delete
             </Item>
         </Menu>
-    </>
+    )
 }

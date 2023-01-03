@@ -5,8 +5,6 @@ import { selectNodeMetaData } from "./adminSlice";
 
 const MetaPage: FC = () => {
     const meta = useSelector(selectNodeMetaData);
-    return <>
-        <NodeTypeTab items={meta} />
-    </>
+    return <NodeTypeTab items={meta} />
 }
 export default MetaPage;

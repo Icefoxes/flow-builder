@@ -17,39 +17,39 @@ export interface ChangeNodeProps {
 }
 
 export enum NodeContextMenuType {
-    Create = "Create",
-    Copy = "Copy",
-    ChangeType = "ChangeType",
-    Delete = "Delete",
-    Edit = "Edit"
+    CreateNode = "CreateNode",
+    CopyNode = "CopyNode",
+    ChangeNodeType = "ChangeNodeType",
+    DeleteNode = "DeleteNode",
+    EditNode = "EditNode"
 }
 
 
 export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, props?: any) => void }> = ({ onItemClick }) => {
 
-    return <>
+    return (
         <Menu id={NODE_MENU_ID}>
-            <Item key='create' onClick={({ props }) => onItemClick(NodeContextMenuType.Create, props)}>
+            <Item key='create' onClick={({ props }) => onItemClick(NodeContextMenuType.CreateNode, props)}>
                 Add Node
             </Item>
 
             <Item key='copy' onClick={({ props }) => {
                 const node = props as GnomonNode;
-                onItemClick(NodeContextMenuType.Copy, node);
+                onItemClick(NodeContextMenuType.CopyNode, node);
             }}>
                 Copy Node
             </Item>
 
             <Item key='edit' onClick={({ props }) => {
                 const node = props as GnomonNode;
-                onItemClick(NodeContextMenuType.Edit, node);
+                onItemClick(NodeContextMenuType.EditNode, node);
             }}>
                 Edit Node
             </Item>
 
             <Item onClick={({ props }) => {
                 const node = props as GnomonNode;
-                onItemClick(NodeContextMenuType.Delete, node);
+                onItemClick(NodeContextMenuType.DeleteNode, node);
             }}>
                 Delete Node
             </Item>
@@ -66,7 +66,7 @@ export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, prop
                             }}
                             onClick={({ props }) => {
                                 const node = props as GnomonNode;
-                                onItemClick(NodeContextMenuType.ChangeType, {
+                                onItemClick(NodeContextMenuType.ChangeNodeType, {
                                     id: node.id,
                                     type: nodeType
                                 } as ChangeNodeProps)
@@ -77,5 +77,5 @@ export const NodeContextMenu: FC<{ onItemClick: (item: NodeContextMenuType, prop
                 })}
             </Submenu>
         </Menu>
-    </>
+    )
 }
